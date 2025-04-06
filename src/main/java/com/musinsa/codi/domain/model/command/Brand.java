@@ -36,11 +36,22 @@ public class Brand {
     }
 
     public void addProduct(Product product) {
+        validateProductCategory(product);
+        validateProductId(product);
+        product.setBrand(this);
+        products.add(product);
+    }
+
+    private void validateProductCategory(Product product) {
         if (products.stream().anyMatch(p -> p.getCategory() == product.getCategory())) {
             throw new BusinessException(ErrorCode.PRODUCT_CATEGORY_ALREADY_EXISTS);
         }
-        product.setBrand(this);
-        products.add(product);
+    }
+
+    private void validateProductId(Product product) {
+        if (product.getId() != null && products.stream().anyMatch(p -> p.getId().equals(product.getId()))) {
+            throw new BusinessException(ErrorCode.PRODUCT_ALREADY_EXISTS);
+        }
     }
 
     public Product findProductById(Long productId) {
@@ -60,5 +71,18 @@ public class Brand {
     public void removeProduct(Long productId) {
         Product product = findProductById(productId);
         products.remove(product);
+    }
+
+    public void updateProduct(Long productId, Product updatedProduct) {
+        Product existingProduct = findProductById(productId);
+        validateProductCategory(updatedProduct);
+        // 다른 상품이 이미 해당 카테고리를 사용하고 있는지 확인
+        if (products.stream()
+                .filter(p -> !p.getId().equals(productId))
+                .anyMatch(p -> p.getCategory() == updatedProduct.getCategory())) {
+            throw new BusinessException(ErrorCode.PRODUCT_CATEGORY_ALREADY_EXISTS);
+        }
+
+        existingProduct.update(updatedProduct.getName(), updatedProduct.getPrice(), updatedProduct.getCategory());
     }
 } 

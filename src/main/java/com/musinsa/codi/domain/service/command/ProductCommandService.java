@@ -48,11 +48,15 @@ public class ProductCommandService implements ProductCommandUseCase {
     @PublishProductEvent(eventType = ProductEventType.UPDATED)
     public Product updateProduct(String brandName, Long productId, ProductCommandRequest request) {
         Brand brand = findBrandByName(brandName);
-        Product product = brand.findProductById(productId);
-        product.update(request.getName(), request.getPrice(), request.getCategory());
+        Product updatedProduct = Product.builder()
+                .name(request.getName())
+                .price(request.getPrice())
+                .category(request.getCategory())
+                .build();
+        
+        brand.updateProduct(productId, updatedProduct);
         Brand savedBrand = brandCommandPort.save(brand);
         
-        // 업데이트된 상품 반환
         return savedBrand.findProductById(productId);
     }
 
