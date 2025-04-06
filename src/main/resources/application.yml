@@ -18,4 +18,10 @@ spring:
       path: /h2-console
 
 server:
-  port: 8080 
+  port: 8080
+  
+logging:
+  level:
+    com.musinsa.codi.domain.service.command: DEBUG
+    com.musinsa.codi.common.aop: DEBUG
+    com.musinsa.codi.adapter.outbound.event: DEBUG 

@@ -3,6 +3,7 @@ package com.musinsa.codi.adapter.inbound.controller.command;
 import com.musinsa.codi.application.usecase.command.ProductCommandUseCase;
 import com.musinsa.codi.common.dto.command.ProductCommandRequest;
 import com.musinsa.codi.common.dto.command.ProductCommandResponse;
+import com.musinsa.codi.domain.model.command.Product;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +19,11 @@ public class ProductCommandController {
     public ResponseEntity<ProductCommandResponse> addProduct(
             @PathVariable String brandName,
             @Valid @RequestBody ProductCommandRequest request) {
-        Long productId = productCommandUseCase.addProduct(brandName, request).getProducts().stream()
-                .filter(p -> p.getName().equals(request.getName()))
-                .findFirst()
-                .orElseThrow()
-                .getId();
+        Product product = productCommandUseCase.addProduct(brandName, request);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
                 .message("상품이 성공적으로 추가되었습니다.")
-                .productId(productId)
+                .productId(product.getId())
                 .build());
     }
 
@@ -35,11 +32,11 @@ public class ProductCommandController {
             @PathVariable String brandName,
             @PathVariable Long productId,
             @Valid @RequestBody ProductCommandRequest request) {
-        productCommandUseCase.updateProduct(brandName, productId, request);
+        Product product = productCommandUseCase.updateProduct(brandName, productId, request);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
                 .message("상품이 성공적으로 업데이트되었습니다.")
-                .productId(productId)
+                .productId(product.getId())
                 .build());
     }
 

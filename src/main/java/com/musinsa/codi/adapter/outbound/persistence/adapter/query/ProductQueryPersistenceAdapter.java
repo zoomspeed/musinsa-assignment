@@ -22,7 +22,11 @@ public class ProductQueryPersistenceAdapter implements ProductQueryPort {
 
     @Override
     public Optional<ProductView> findById(Long id) {
-        return productQueryRepository.findById(id);
+        List<ProductView> products = productQueryRepository.findAllById(id);
+        if (products.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(products.get(0));
     }
 
     @Override
@@ -47,6 +51,24 @@ public class ProductQueryPersistenceAdapter implements ProductQueryPort {
 
     @Override
     public void delete(Long id) {
-        productQueryRepository.deleteById(id);
+        List<ProductView> products = productQueryRepository.findAllById(id);
+        for (ProductView product : products) {
+            productQueryRepository.delete(product);
+        }
+    }
+    
+    @Override
+    public List<ProductView> findByProductId(Long productId) {
+        return productQueryRepository.findAllById(productId);
+    }
+    
+    @Override
+    public Optional<ProductView> findByProductIdAndCategory(Long productId, Category category) {
+        return productQueryRepository.findByIdAndCategory(productId, category);
+    }
+    
+    @Override
+    public void deleteByViewId(Long viewId) {
+        productQueryRepository.deleteById(viewId);
     }
 } 

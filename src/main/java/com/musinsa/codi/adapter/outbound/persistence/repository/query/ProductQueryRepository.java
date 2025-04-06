@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductQueryRepository extends JpaRepository<ProductView, Long> {
     List<ProductView> findByCategory(Category category);
@@ -19,4 +20,8 @@ public interface ProductQueryRepository extends JpaRepository<ProductView, Long>
     );
     
     List<ProductView> findByBrandId(Long brandId);
+    
+    List<ProductView> findAllById(Long id);
+    Optional<ProductView> findByIdAndCategory(Long id, Category category);
+    void deleteByViewId(Long viewId);
 } 

@@ -13,4 +13,9 @@ public interface ProductQueryPort {
     List<ProductView> findByBrandId(Long brandId);
     ProductView save(ProductView productView);
     void delete(Long id);
+    
+    // 새로 추가된 메서드
+    List<ProductView> findByProductId(Long productId);
+    Optional<ProductView> findByProductIdAndCategory(Long productId, Category category);
+    void deleteByViewId(Long viewId);
 } 

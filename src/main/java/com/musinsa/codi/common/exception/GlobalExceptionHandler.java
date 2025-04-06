@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -112,6 +113,25 @@ public class GlobalExceptionHandler {
         return Arrays.stream(enumClass.getEnumConstants())
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        // 중복 키 오류인 경우
+        if (e.getMessage().contains("PRODUCT_VIEW(ID") && e.getMessage().contains("CATEGORY")) {
+            ErrorResponse errorResponse = ErrorResponse.of(
+                    HttpStatus.CONFLICT.value(),
+                    "이미 동일한 카테고리에 같은 이름의 상품이 존재합니다."
+            );
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        }
+        
+        // 그 외 무결성 제약조건 위반
+        ErrorResponse errorResponse = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                "데이터 제약조건 위반이 발생했습니다."
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)

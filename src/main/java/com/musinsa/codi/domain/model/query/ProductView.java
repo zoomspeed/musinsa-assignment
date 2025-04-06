@@ -7,11 +7,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "product_view")
+@Table(name = "product_view", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"id", "category"})
+})
 @Getter
 @NoArgsConstructor
 public class ProductView {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long viewId;
+    
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false)
