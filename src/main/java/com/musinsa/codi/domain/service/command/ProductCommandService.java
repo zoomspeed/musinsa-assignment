@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -36,11 +37,16 @@ public class ProductCommandService implements ProductCommandUseCase {
                 .price(request.getPrice())
                 .category(request.getCategory())
                 .build();
+        
         brand.addProduct(product);
         Brand savedBrand = brandCommandPort.save(brand);
         
-        // 저장된 상품 찾기 (ID 획득을 위해)
-        return savedBrand.findProductByName(request.getName());
+        // 저장된 브랜드의 상품 목록에서 마지막 상품을 반환
+        List<Product> savedProducts = savedBrand.getProducts();
+        if (savedProducts.isEmpty()) {
+            throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+        return savedProducts.get(savedProducts.size() - 1);
     }
 
     @Override
@@ -48,16 +54,13 @@ public class ProductCommandService implements ProductCommandUseCase {
     @PublishProductEvent(eventType = ProductEventType.UPDATED)
     public Product updateProduct(String brandName, Long productId, ProductCommandRequest request) {
         Brand brand = findBrandByName(brandName);
-        Product updatedProduct = Product.builder()
-                .name(request.getName())
-                .price(request.getPrice())
-                .category(request.getCategory())
-                .build();
+        Product existingProduct = brand.findProductById(productId);
         
-        brand.updateProduct(productId, updatedProduct);
-        Brand savedBrand = brandCommandPort.save(brand);
+        // 기존 상품의 정보를 업데이트
+        existingProduct.update(request.getName(), request.getPrice(), request.getCategory());
+        brandCommandPort.save(brand);
         
-        return savedBrand.findProductById(productId);
+        return existingProduct;
     }
 
     @Override

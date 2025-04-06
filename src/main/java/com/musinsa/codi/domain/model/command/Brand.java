@@ -25,6 +25,9 @@ public class Brand {
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
+    
+    @Transient  // DB에 저장되지 않는 임시 필드
+    private Product lastAddedProduct;
 
     @Builder
     public Brand(String name) {
@@ -36,16 +39,10 @@ public class Brand {
     }
 
     public void addProduct(Product product) {
-        validateProductCategory(product);
         validateProductId(product);
         product.setBrand(this);
         products.add(product);
-    }
-
-    private void validateProductCategory(Product product) {
-        if (products.stream().anyMatch(p -> p.getCategory() == product.getCategory())) {
-            throw new BusinessException(ErrorCode.PRODUCT_CATEGORY_ALREADY_EXISTS);
-        }
+        this.lastAddedProduct = product;  // 마지막으로 추가된 상품 추적
     }
 
     private void validateProductId(Product product) {
@@ -72,17 +69,11 @@ public class Brand {
         Product product = findProductById(productId);
         products.remove(product);
     }
-
-    public void updateProduct(Long productId, Product updatedProduct) {
-        Product existingProduct = findProductById(productId);
-        validateProductCategory(updatedProduct);
-        // 다른 상품이 이미 해당 카테고리를 사용하고 있는지 확인
-        if (products.stream()
-                .filter(p -> !p.getId().equals(productId))
-                .anyMatch(p -> p.getCategory() == updatedProduct.getCategory())) {
-            throw new BusinessException(ErrorCode.PRODUCT_CATEGORY_ALREADY_EXISTS);
+    
+    public Product getLastAddedProduct() {
+        if (lastAddedProduct == null) {
+            throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
         }
-
-        existingProduct.update(updatedProduct.getName(), updatedProduct.getPrice(), updatedProduct.getCategory());
+        return lastAddedProduct;
     }
 } 
