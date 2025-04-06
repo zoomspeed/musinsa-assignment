@@ -59,8 +59,8 @@ public class ProductEventListener {
         log.info("ProductEventListener: 상품 삭제 이벤트 처리 - ID: {}", product.getId());
         List<ProductView> productViews = productQueryPort.findByProductId(product.getId());
         for (ProductView productView : productViews) {
-            productQueryPort.deleteByViewId(productView.getViewId());
-            log.info("ProductEventListener: 상품 뷰 삭제 완료 - ViewID: {}", productView.getViewId());
+            productQueryPort.deleteById(productView.getId());
+            log.info("ProductEventListener: 상품 뷰 삭제 완료 - ID: {}", productView.getId());
         }
     }
 
@@ -83,29 +83,35 @@ public class ProductEventListener {
             List<ProductView> existingViews = productQueryPort.findByProductId(product.getId());
 
             ProductView productView = ProductView.builder()
-                    .id(product.getId())
-                    .name(product.getName())
-                    .category(product.getCategory())
-                    .price(product.getPrice())
+                    .productId(product.getId())
                     .brandId(product.getBrand().getId())
                     .brandName(brandName)
+                    .category(product.getCategory())
+                    .price(product.getPrice())
                     .build();
 
             if (isUpdate && !existingViews.isEmpty()) {
                 ProductView existingView = existingViews.get(0);
-                productView.setViewId(existingView.getViewId());
-                log.info("ProductEventListener: 기존 상품 뷰 업데이트 - ID: {}, 카테고리: {}, ViewID: {}", 
-                        existingView.getId(), existingView.getCategory(), existingView.getViewId());
+                productView = ProductView.builder()
+                        .id(existingView.getId())
+                        .productId(product.getId())
+                        .brandId(product.getBrand().getId())
+                        .brandName(brandName)
+                        .category(product.getCategory())
+                        .price(product.getPrice())
+                        .build();
+                log.info("ProductEventListener: 기존 상품 뷰 업데이트 - ID: {}, 카테고리: {}", 
+                        existingView.getId(), existingView.getCategory().getCode());
             }
             
             ProductView savedView = productQueryPort.save(productView);
-            log.info("ProductEventListener: 상품 뷰 저장 성공 - ID: {}, 이름: {}, 카테고리: {}, 이벤트 타입: {}",
-                    savedView.getId(), savedView.getName(), savedView.getCategory(), 
+            log.info("ProductEventListener: 상품 뷰 저장 성공 - ID: {}, ProductID: {}, 카테고리: {}, 이벤트 타입: {}",
+                    savedView.getId(), savedView.getProductId(), savedView.getCategory().getCode(), 
                     isUpdate ? "UPDATE" : "CREATE");
             
         } catch (DataIntegrityViolationException e) {
             log.error("ProductEventListener: 데이터 무결성 위반 오류 - ID: {}, 카테고리: {}, 오류: {}", 
-                    product.getId(), product.getCategory(), e.getMessage());
+                    product.getId(), product.getCategory().getCode(), e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error("ProductEventListener: 상품 뷰 저장 중 오류 발생", e);

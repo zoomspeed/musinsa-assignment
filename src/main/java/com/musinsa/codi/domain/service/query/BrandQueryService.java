@@ -1,8 +1,8 @@
 package com.musinsa.codi.domain.service.query;
 
+import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
 import com.musinsa.codi.common.exception.BusinessException;
 import com.musinsa.codi.common.exception.ErrorCode;
-import com.musinsa.codi.domain.model.Category;
 import com.musinsa.codi.domain.model.query.BrandView;
 import com.musinsa.codi.domain.port.query.BrandQueryPort;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +26,11 @@ public class BrandQueryService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
     }
 
-    public List<BrandView> getBrandsByCategory(Category category) {
-        return brandQueryPort.findByCategory(category);
+    public List<BrandView> getBrandsByCategory(CategoryCommandResponse categoryResponse) {
+        return brandQueryPort.findByCategory(categoryResponse.toEntity());
     }
 
-    public List<BrandView> getBrandsByPriceRange(Category category, int minPrice, int maxPrice) {
-        return brandQueryPort.findByPriceRange(category, minPrice, maxPrice);
+    public List<BrandView> getBrandsByPriceRange(CategoryCommandResponse categoryResponse, int minPrice, int maxPrice) {
+        return brandQueryPort.findByPriceRange(categoryResponse.toEntity(), minPrice, maxPrice);
     }
 } 

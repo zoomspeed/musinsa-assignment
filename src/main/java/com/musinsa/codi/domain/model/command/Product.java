@@ -1,6 +1,5 @@
 package com.musinsa.codi.domain.model.command;
 
-import com.musinsa.codi.domain.model.Category;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,8 +21,8 @@ public class Product {
     @Column(nullable = false)
     private int price;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)

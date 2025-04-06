@@ -50,8 +50,17 @@ public class BrandEventListener {
         for (ProductView productView : productViews) {
             log.debug("BrandEventListener: 상품 뷰 업데이트 - ID: {}, 이전 브랜드명: {}, 새 브랜드명: {}", 
                     productView.getId(), productView.getBrandName(), newBrandName);
-            productView.setBrandName(newBrandName);
-            productQueryPort.save(productView);
+            
+            ProductView updatedView = ProductView.builder()
+                    .id(productView.getId())
+                    .productId(productView.getProductId())
+                    .brandId(productView.getBrandId())
+                    .brandName(newBrandName)
+                    .category(productView.getCategory())
+                    .price(productView.getPrice())
+                    .build();
+                    
+            productQueryPort.save(updatedView);
         }
         
         log.info("BrandEventListener: 브랜드({})의 상품 뷰 {}개 업데이트 완료", brandId, productViews.size());

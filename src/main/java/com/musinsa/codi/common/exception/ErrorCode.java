@@ -12,7 +12,8 @@ public enum ErrorCode {
     PRODUCT_CATEGORY_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 상품 카테고리입니다."),
     CODI_NOT_FOUND(HttpStatus.NOT_FOUND, "코디를 찾을 수 없습니다."),
     INVALID_PRICE(HttpStatus.BAD_REQUEST, "유효하지 않은 가격입니다."),
-    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 카테고리입니다.");
+    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 카테고리입니다."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

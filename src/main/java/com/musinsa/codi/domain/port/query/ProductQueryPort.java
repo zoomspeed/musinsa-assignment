@@ -1,6 +1,6 @@
 package com.musinsa.codi.domain.port.query;
 
-import com.musinsa.codi.domain.model.Category;
+import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.query.ProductView;
 import java.util.List;
 import java.util.Optional;
@@ -17,5 +17,5 @@ public interface ProductQueryPort {
     // 새로 추가된 메서드
     List<ProductView> findByProductId(Long productId);
     Optional<ProductView> findByProductIdAndCategory(Long productId, Category category);
-    void deleteByViewId(Long viewId);
+    void deleteById(Long id);
 } 

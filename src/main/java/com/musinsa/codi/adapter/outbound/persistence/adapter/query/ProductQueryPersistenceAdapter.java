@@ -1,6 +1,6 @@
 package com.musinsa.codi.adapter.outbound.persistence.adapter.query;
 
-import com.musinsa.codi.domain.model.Category;
+import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.query.ProductView;
 import com.musinsa.codi.domain.port.query.ProductQueryPort;
 import com.musinsa.codi.adapter.outbound.persistence.repository.query.ProductQueryRepository;
@@ -61,9 +61,9 @@ public class ProductQueryPersistenceAdapter implements ProductQueryPort {
     public Optional<ProductView> findByProductIdAndCategory(Long productId, Category category) {
         return productQueryRepository.findByIdAndCategory(productId, category);
     }
-    
+
     @Override
-    public void deleteByViewId(Long viewId) {
-        productQueryRepository.deleteById(viewId);
+    public void deleteById(Long id) {
+        productQueryRepository.deleteById(id);
     }
 } 

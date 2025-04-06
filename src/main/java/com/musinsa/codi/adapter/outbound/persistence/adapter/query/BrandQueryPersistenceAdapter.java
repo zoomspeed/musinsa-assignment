@@ -1,6 +1,6 @@
 package com.musinsa.codi.adapter.outbound.persistence.adapter.query;
 
-import com.musinsa.codi.domain.model.Category;
+import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.query.BrandView;
 import com.musinsa.codi.domain.port.query.BrandQueryPort;
 import com.musinsa.codi.adapter.outbound.persistence.repository.query.BrandQueryRepository;

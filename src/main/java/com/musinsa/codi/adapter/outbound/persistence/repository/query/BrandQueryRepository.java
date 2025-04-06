@@ -1,6 +1,6 @@
 package com.musinsa.codi.adapter.outbound.persistence.repository.query;
 
-import com.musinsa.codi.domain.model.Category;
+import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.query.BrandView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

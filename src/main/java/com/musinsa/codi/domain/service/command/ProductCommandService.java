@@ -13,6 +13,7 @@ import com.musinsa.codi.domain.event.ProductEventType;
 import com.musinsa.codi.domain.model.command.Brand;
 import com.musinsa.codi.domain.model.command.Product;
 import com.musinsa.codi.domain.port.command.BrandCommandPort;
+import com.musinsa.codi.domain.port.command.CategoryCommandPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.List;
 @Transactional
 public class ProductCommandService implements ProductCommandUseCase {
     private final BrandCommandPort brandCommandPort;
+    private final CategoryCommandPort categoryCommandPort;
     private final ProductEventPublisher productEventPublisher;
 
     @Override
@@ -35,7 +37,8 @@ public class ProductCommandService implements ProductCommandUseCase {
         Product product = Product.builder()
                 .name(request.getName())
                 .price(request.getPrice())
-                .category(request.getCategory())
+                .category(categoryCommandPort.findByCode(request.getCategoryCode())
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND)))
                 .build();
         
         brand.addProduct(product);
@@ -57,7 +60,12 @@ public class ProductCommandService implements ProductCommandUseCase {
         Product existingProduct = brand.findProductById(productId);
         
         // 기존 상품의 정보를 업데이트
-        existingProduct.update(request.getName(), request.getPrice(), request.getCategory());
+        existingProduct.update(
+            request.getName(), 
+            request.getPrice(), 
+            categoryCommandPort.findByCode(request.getCategoryCode())
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND))
+        );
         brandCommandPort.save(brand);
         
         return existingProduct;

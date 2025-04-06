@@ -1,6 +1,5 @@
 package com.musinsa.codi.domain.model.query;
 
-import com.musinsa.codi.domain.model.Category;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

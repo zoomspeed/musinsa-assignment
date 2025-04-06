@@ -1,10 +1,10 @@
-package com.musinsa.codi.domain.model;
-
-public enum Category {
-    OUTER,
-    TOP,
-    BOTTOM,
-    SHOES,
-    BAG,
-    ACCESSORY
-} 
+//package com.musinsa.codi.domain.model;
+//
+//public enum Category {
+//    OUTER,
+//    TOP,
+//    BOTTOM,
+//    SHOES,
+//    BAG,
+//    ACCESSORY
+//}
