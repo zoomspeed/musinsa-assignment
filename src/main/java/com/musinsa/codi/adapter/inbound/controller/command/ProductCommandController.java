@@ -1,8 +1,8 @@
 package com.musinsa.codi.adapter.inbound.controller.command;
 
+import com.musinsa.codi.application.usecase.command.ProductCommandUseCase;
 import com.musinsa.codi.common.dto.command.ProductCommandRequest;
 import com.musinsa.codi.common.dto.command.ProductCommandResponse;
-import com.musinsa.codi.domain.service.command.ProductCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/brands/{brandName}/products")
 @RequiredArgsConstructor
 public class ProductCommandController {
-    private final ProductCommandService productCommandService;
+    private final ProductCommandUseCase productCommandUseCase;
 
     @PostMapping
     public ResponseEntity<ProductCommandResponse> addProduct(
             @PathVariable String brandName,
             @Valid @RequestBody ProductCommandRequest request) {
-        Long productId = productCommandService.addProduct(brandName, request).getProducts().stream()
+        Long productId = productCommandUseCase.addProduct(brandName, request).getProducts().stream()
                 .filter(p -> p.getName().equals(request.getName()))
                 .findFirst()
                 .orElseThrow()
@@ -35,7 +35,7 @@ public class ProductCommandController {
             @PathVariable String brandName,
             @PathVariable Long productId,
             @Valid @RequestBody ProductCommandRequest request) {
-        productCommandService.updateProduct(brandName, productId, request);
+        productCommandUseCase.updateProduct(brandName, productId, request);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
                 .message("상품이 성공적으로 업데이트되었습니다.")
@@ -47,7 +47,7 @@ public class ProductCommandController {
     public ResponseEntity<ProductCommandResponse> deleteProduct(
             @PathVariable String brandName,
             @PathVariable Long productId) {
-        productCommandService.deleteProduct(brandName, productId);
+        productCommandUseCase.deleteProduct(brandName, productId);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
                 .message("상품이 성공적으로 삭제되었습니다.")
