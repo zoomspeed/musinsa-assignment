@@ -39,4 +39,14 @@ public class BrandQueryPersistenceAdapter implements BrandQueryPort {
     public List<BrandView> findByPriceRange(Category category, int minPrice, int maxPrice) {
         return brandViewRepository.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
     }
+
+    @Override
+    public BrandView save(BrandView brandView) {
+        return brandViewRepository.save(brandView);
+    }
+
+    @Override
+    public void delete(Long id) {
+        brandViewRepository.deleteById(id);
+    }
 } 

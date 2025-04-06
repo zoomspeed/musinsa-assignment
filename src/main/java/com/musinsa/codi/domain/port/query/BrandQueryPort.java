@@ -11,4 +11,6 @@ public interface BrandQueryPort {
     Optional<BrandView> findByName(String name);
     List<BrandView> findByCategory(Category category);
     List<BrandView> findByPriceRange(Category category, int minPrice, int maxPrice);
+    BrandView save(BrandView brandView);
+    void delete(Long id);
 } 
