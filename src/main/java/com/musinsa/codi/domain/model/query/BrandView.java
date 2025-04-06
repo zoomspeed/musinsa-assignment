@@ -20,8 +20,8 @@ public class BrandView {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "brand_id")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "brand_id", updatable = false)
     private List<ProductView> products = new ArrayList<>();
 
     @Builder
