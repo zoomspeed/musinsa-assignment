@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "product_view", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"id", "category"})
+    // @UniqueConstraint(columnNames = {"id", "category"})
 })
 @Getter
+@Setter
 @NoArgsConstructor
 public class ProductView {
     @Id

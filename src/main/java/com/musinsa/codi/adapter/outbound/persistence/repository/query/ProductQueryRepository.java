@@ -21,7 +21,6 @@ public interface ProductQueryRepository extends JpaRepository<ProductView, Long>
     
     List<ProductView> findByBrandId(Long brandId);
     
-    List<ProductView> findAllById(Long id);
     Optional<ProductView> findByIdAndCategory(Long id, Category category);
     void deleteByViewId(Long viewId);
 } 
