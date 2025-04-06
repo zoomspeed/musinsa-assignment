@@ -1,11 +1,12 @@
 package com.musinsa.codi.adapter.inbound.controller.command;
 
-import com.musinsa.codi.common.dto.command.BrandCommandResponse;
 import com.musinsa.codi.common.dto.command.BrandCommandRequest;
-import com.musinsa.codi.common.dto.command.ProductCommandResponse;
+import com.musinsa.codi.common.dto.command.BrandCommandResponse;
 import com.musinsa.codi.common.dto.command.ProductCommandRequest;
+import com.musinsa.codi.common.dto.command.ProductCommandResponse;
 import com.musinsa.codi.domain.model.command.Brand;
 import com.musinsa.codi.domain.service.command.BrandCommandService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class BrandCommandController {
     private final BrandCommandService brandCommandService;
 
     @PostMapping
-    public ResponseEntity<BrandCommandResponse> createBrand(@RequestBody BrandCommandRequest request) {
+    public ResponseEntity<BrandCommandResponse> createBrand(@Valid @RequestBody BrandCommandRequest request) {
         Brand brand = brandCommandService.createBrand(request);
         return ResponseEntity.ok(BrandCommandResponse.builder()
                 .success(true)
@@ -29,11 +30,12 @@ public class BrandCommandController {
     @PostMapping("/{brandName}/products")
     public ResponseEntity<ProductCommandResponse> addProduct(
             @PathVariable String brandName,
-            @RequestBody ProductCommandRequest request) {
+            @Valid @RequestBody ProductCommandRequest request) {
         Brand brand = brandCommandService.addProduct(brandName, request);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
                 .message("상품이 성공적으로 추가되었습니다.")
+                .productId(brand.getProducts().get(brand.getProducts().size() - 1).getId())
                 .brandId(brand.getId())
                 .build());
     }
@@ -42,7 +44,7 @@ public class BrandCommandController {
     public ResponseEntity<ProductCommandResponse> updateProduct(
             @PathVariable String brandName,
             @PathVariable Long productId,
-            @RequestBody ProductCommandRequest request) {
+            @Valid @RequestBody ProductCommandRequest request) {
         Brand brand = brandCommandService.updateProduct(brandName, productId, request);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
