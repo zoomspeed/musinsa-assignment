@@ -50,6 +50,13 @@ public class Brand {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
+    public Product findProductByName(String productName) {
+        return products.stream()
+                .filter(p -> p.getName().equals(productName))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+
     public void removeProduct(Long productId) {
         Product product = findProductById(productId);
         products.remove(product);

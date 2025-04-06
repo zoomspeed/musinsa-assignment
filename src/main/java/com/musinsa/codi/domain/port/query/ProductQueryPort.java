@@ -11,4 +11,6 @@ public interface ProductQueryPort {
     List<ProductView> findByCategory(Category category);
     List<ProductView> findByPriceRange(Category category, int minPrice, int maxPrice);
     List<ProductView> findByBrandId(Long brandId);
+    ProductView save(ProductView productView);
+    void delete(Long id);
 } 

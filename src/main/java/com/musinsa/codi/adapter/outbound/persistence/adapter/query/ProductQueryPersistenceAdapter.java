@@ -39,4 +39,14 @@ public class ProductQueryPersistenceAdapter implements ProductQueryPort {
     public List<ProductView> findByBrandId(Long brandId) {
         return productQueryRepository.findByBrandId(brandId);
     }
+
+    @Override
+    public ProductView save(ProductView productView) {
+        return productQueryRepository.save(productView);
+    }
+
+    @Override
+    public void delete(Long id) {
+        productQueryRepository.deleteById(id);
+    }
 } 
