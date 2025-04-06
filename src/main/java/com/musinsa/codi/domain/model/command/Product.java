@@ -2,6 +2,7 @@ package com.musinsa.codi.domain.model.command;
 
 import com.musinsa.codi.domain.model.Category;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "products")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,30 +19,31 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private int price;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category;
-
-    @Column(nullable = false)
-    private int price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
     @Builder
-    public Product(Long id, String name, Category category, int price) {
-        this.id = id;
+    public Product(String name, int price, Category category) {
         this.name = name;
-        this.category = category;
         this.price = price;
+        this.category = category;
     }
 
     public void setBrand(Brand brand) {
         this.brand = brand;
     }
 
-    public void updatePrice(int price) {
+    public void update(String name, int price, Category category) {
+        this.name = name;
         this.price = price;
+        this.category = category;
     }
 } 

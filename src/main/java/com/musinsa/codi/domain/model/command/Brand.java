@@ -3,6 +3,7 @@ package com.musinsa.codi.domain.model.command;
 import com.musinsa.codi.common.exception.BusinessException;
 import com.musinsa.codi.common.exception.ErrorCode;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "brands")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Brand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +27,7 @@ public class Brand {
     private List<Product> products = new ArrayList<>();
 
     @Builder
-    public Brand(Long id, String name) {
-        this.id = id;
+    public Brand(String name) {
         this.name = name;
     }
 
@@ -37,14 +37,21 @@ public class Brand {
 
     public void addProduct(Product product) {
         if (products.stream().anyMatch(p -> p.getCategory() == product.getCategory())) {
-            throw new BusinessException(ErrorCode.PRODUCT_ALREADY_EXISTS);
+            throw new BusinessException(ErrorCode.PRODUCT_CATEGORY_ALREADY_EXISTS);
         }
         product.setBrand(this);
         products.add(product);
     }
 
-    public void removeProduct(Product product) {
+    public Product findProductById(Long productId) {
+        return products.stream()
+                .filter(p -> p.getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+
+    public void removeProduct(Long productId) {
+        Product product = findProductById(productId);
         products.remove(product);
-        product.setBrand(null);
     }
 } 
