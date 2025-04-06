@@ -1,5 +1,6 @@
 package com.musinsa.codi.domain.model.query;
 
+import com.musinsa.codi.domain.model.Category;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,18 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "brand_views")
+@Table(name = "brand_view")
 @Getter
 @NoArgsConstructor
 public class BrandView {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "brand_id")
     private List<ProductView> products = new ArrayList<>();
 
     @Builder
@@ -31,6 +32,9 @@ public class BrandView {
 
     public void addProduct(ProductView product) {
         products.add(product);
-        product.setBrand(this);
+    }
+
+    public void removeProduct(ProductView product) {
+        products.remove(product);
     }
 } 

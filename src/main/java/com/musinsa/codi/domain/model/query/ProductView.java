@@ -7,12 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "product_views")
+@Table(name = "product_view")
 @Getter
 @NoArgsConstructor
 public class ProductView {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -25,19 +24,19 @@ public class ProductView {
     @Column(nullable = false)
     private int price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
-    private BrandView brand;
+    @Column(name = "brand_id", nullable = false)
+    private Long brandId;
+
+    @Column(name = "brand_name", nullable = false)
+    private String brandName;
 
     @Builder
-    public ProductView(Long id, String name, Category category, int price) {
+    public ProductView(Long id, String name, Category category, int price, Long brandId, String brandName) {
         this.id = id;
         this.name = name;
         this.category = category;
         this.price = price;
-    }
-
-    public void setBrand(BrandView brand) {
-        this.brand = brand;
+        this.brandId = brandId;
+        this.brandName = brandName;
     }
 } 

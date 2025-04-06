@@ -13,25 +13,30 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class ProductQueryPersistenceAdapter implements ProductQueryPort {
-    private final ProductQueryRepository productViewRepository;
+    private final ProductQueryRepository productQueryRepository;
 
     @Override
     public List<ProductView> findAll() {
-        return productViewRepository.findAll();
+        return productQueryRepository.findAll();
     }
 
     @Override
     public Optional<ProductView> findById(Long id) {
-        return productViewRepository.findById(id);
+        return productQueryRepository.findById(id);
     }
 
     @Override
     public List<ProductView> findByCategory(Category category) {
-        return productViewRepository.findByCategory(category);
+        return productQueryRepository.findByCategory(category);
     }
 
     @Override
     public List<ProductView> findByPriceRange(Category category, int minPrice, int maxPrice) {
-        return productViewRepository.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
+        return productQueryRepository.findByPriceRange(category, minPrice, maxPrice);
+    }
+
+    @Override
+    public List<ProductView> findByBrandId(Long brandId) {
+        return productQueryRepository.findByBrandId(brandId);
     }
 } 
