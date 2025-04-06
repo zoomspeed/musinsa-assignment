@@ -1,5 +1,7 @@
 package com.musinsa.codi.domain.model.command;
 
+import com.musinsa.codi.common.exception.BusinessException;
+import com.musinsa.codi.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,9 +31,16 @@ public class Brand {
         this.name = name;
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
     public void addProduct(Product product) {
-        products.add(product);
+        if (products.stream().anyMatch(p -> p.getCategory() == product.getCategory())) {
+            throw new BusinessException(ErrorCode.PRODUCT_ALREADY_EXISTS);
+        }
         product.setBrand(this);
+        products.add(product);
     }
 
     public void removeProduct(Product product) {

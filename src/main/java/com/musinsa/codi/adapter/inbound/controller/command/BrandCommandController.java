@@ -27,6 +27,18 @@ public class BrandCommandController {
                 .build());
     }
 
+    @PutMapping("/{brandName}")
+    public ResponseEntity<BrandCommandResponse> updateBrand(
+            @PathVariable String brandName,
+            @Valid @RequestBody BrandCommandRequest request) {
+        Brand brand = brandCommandService.updateBrand(brandName, request);
+        return ResponseEntity.ok(BrandCommandResponse.builder()
+                .success(true)
+                .message("브랜드명이 성공적으로 변경되었습니다.")
+                .brandId(brand.getId())
+                .build());
+    }
+
     @PostMapping("/{brandName}/products")
     public ResponseEntity<ProductCommandResponse> addProduct(
             @PathVariable String brandName,

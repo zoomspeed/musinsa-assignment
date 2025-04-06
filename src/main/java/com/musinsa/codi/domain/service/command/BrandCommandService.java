@@ -4,6 +4,9 @@ import com.musinsa.codi.common.dto.command.BrandCommandRequest;
 import com.musinsa.codi.common.dto.command.ProductCommandRequest;
 import com.musinsa.codi.common.exception.BusinessException;
 import com.musinsa.codi.common.exception.ErrorCode;
+import com.musinsa.codi.domain.event.BrandEvent;
+import com.musinsa.codi.domain.event.BrandEventPublisher;
+import com.musinsa.codi.domain.event.BrandEventType;
 import com.musinsa.codi.domain.model.command.Brand;
 import com.musinsa.codi.domain.model.command.Product;
 import com.musinsa.codi.domain.port.command.BrandCommandPort;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BrandCommandService {
     private final BrandCommandPort brandCommandPort;
+    private final BrandEventPublisher brandEventPublisher;
 
     public Brand createBrand(BrandCommandRequest request) {
         if (brandCommandPort.existsByName(request.getName())) {
@@ -24,7 +28,23 @@ public class BrandCommandService {
         Brand brand = Brand.builder()
                 .name(request.getName())
                 .build();
-        return brandCommandPort.save(brand);
+        brand = brandCommandPort.save(brand);
+        brandEventPublisher.publish(new BrandEvent(brand, BrandEventType.CREATED));
+        return brand;
+    }
+
+    public Brand updateBrand(String brandName, BrandCommandRequest request) {
+        Brand brand = brandCommandPort.findByName(brandName)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
+        
+        if (!brand.getName().equals(request.getName()) && brandCommandPort.existsByName(request.getName())) {
+            throw new BusinessException(ErrorCode.BRAND_ALREADY_EXISTS);
+        }
+        
+        brand.updateName(request.getName());
+        brand = brandCommandPort.save(brand);
+        brandEventPublisher.publish(new BrandEvent(brand, BrandEventType.UPDATED));
+        return brand;
     }
 
     public Brand addProduct(String brandName, ProductCommandRequest request) {
@@ -33,7 +53,9 @@ public class BrandCommandService {
         
         Product product = request.toProduct();
         brand.addProduct(product);
-        return brandCommandPort.save(brand);
+        brand = brandCommandPort.save(brand);
+        brandEventPublisher.publish(new BrandEvent(brand, BrandEventType.UPDATED));
+        return brand;
     }
 
     public Brand updateProduct(String brandName, Long productId, ProductCommandRequest request) {
@@ -46,7 +68,9 @@ public class BrandCommandService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         product.updatePrice(request.getPrice());
-        return brandCommandPort.save(brand);
+        brand = brandCommandPort.save(brand);
+        brandEventPublisher.publish(new BrandEvent(brand, BrandEventType.UPDATED));
+        return brand;
     }
 
     public void deleteProduct(String brandName, Long productId) {
@@ -59,12 +83,14 @@ public class BrandCommandService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         brand.removeProduct(product);
-        brandCommandPort.save(brand);
+        brand = brandCommandPort.save(brand);
+        brandEventPublisher.publish(new BrandEvent(brand, BrandEventType.UPDATED));
     }
 
     public void deleteBrand(String brandName) {
         Brand brand = brandCommandPort.findByName(brandName)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
+        brandEventPublisher.publish(new BrandEvent(brand, BrandEventType.DELETED));
         brandCommandPort.delete(brand.getId());
     }
 } 
