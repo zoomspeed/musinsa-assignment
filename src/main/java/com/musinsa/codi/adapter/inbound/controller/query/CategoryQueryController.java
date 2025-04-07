@@ -33,58 +33,6 @@ public class CategoryQueryController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/{categoryCode}/brands")
-    public ResponseEntity<List<BrandQueryResponse>> getBrandsByCategory(
-            @PathVariable String categoryCode) {
-        CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
-                categoryCommandPort.findByCode(categoryCode)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        List<BrandQueryResponse> responses = categoryQueryService.getBrandsByCategory(categoryResponse).stream()
-                .map(BrandQueryResponse::from)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/{categoryCode}/products")
-    public ResponseEntity<List<ProductQueryResponse>> getProductsByCategory(
-            @PathVariable String categoryCode) {
-        CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
-                categoryCommandPort.findByCode(categoryCode)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        List<ProductQueryResponse> responses = categoryQueryService.getProductsByCategory(categoryResponse).stream()
-                .map(ProductQueryResponse::from)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/{categoryCode}/price-range")
-    public ResponseEntity<List<BrandQueryResponse>> getBrandsByPriceRange(
-            @PathVariable String categoryCode,
-            @RequestParam int minPrice,
-            @RequestParam int maxPrice) {
-        CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
-                categoryCommandPort.findByCode(categoryCode)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        List<BrandQueryResponse> responses = categoryQueryService.getBrandsByPriceRange(categoryResponse, minPrice, maxPrice).stream()
-                .map(BrandQueryResponse::from)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/{categoryCode}/products/price-range")
-    public ResponseEntity<List<ProductQueryResponse>> getProductsByPriceRange(
-            @PathVariable String categoryCode,
-            @RequestParam int minPrice,
-            @RequestParam int maxPrice) {
-        CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
-                categoryCommandPort.findByCode(categoryCode)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        List<ProductQueryResponse> responses = categoryQueryService.getProductsByPriceRange(categoryResponse, minPrice, maxPrice).stream()
-                .map(ProductQueryResponse::from)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
     @GetMapping("/lowest-prices")
     public ResponseEntity<CategoryLowestPriceResponse> getLowestPricesByCategory() {
         return ResponseEntity.ok(categoryQueryUseCase.findLowestPricesByCategory());
