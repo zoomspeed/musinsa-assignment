@@ -1,22 +1,26 @@
 package com.musinsa.codi.domain.service.query;
 
-import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
-import com.musinsa.codi.common.dto.query.BrandLowestPriceResponse;
+import com.musinsa.codi.common.dto.query.BrandTotalPriceResponse;
 import com.musinsa.codi.common.exception.BusinessException;
 import com.musinsa.codi.common.exception.ErrorCode;
 import com.musinsa.codi.domain.model.query.BrandView;
+import com.musinsa.codi.domain.model.query.ProductView;
 import com.musinsa.codi.domain.port.query.BrandQueryPort;
+import com.musinsa.codi.domain.port.query.ProductQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BrandQueryService {
     private final BrandQueryPort brandQueryPort;
+    private final ProductQueryPort productQueryPort;
 
     public List<BrandView> getAllBrands() {
         return brandQueryPort.findAll();
@@ -27,18 +31,17 @@ public class BrandQueryService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
     }
 
-    public List<BrandView> getBrandsByCategory(CategoryCommandResponse categoryResponse) {
-        return brandQueryPort.findByCategory(categoryResponse.toEntity().getId());
-    }
+    public BrandTotalPriceResponse findLowestTotalPriceBrand() {
+        List<ProductView> allProducts = productQueryPort.findAll();
 
-    public List<BrandView> getBrandsByPriceRange(CategoryCommandResponse categoryResponse, int minPrice, int maxPrice) {
-        return brandQueryPort.findByPriceRange(categoryResponse.toEntity(), minPrice, maxPrice);
-    }
+        // 브랜드별로 상품들을 그룹화
+        Map<String, List<ProductView>> productsByBrand = allProducts.stream()
+                .collect(Collectors.groupingBy(ProductView::getBrandName));
 
-    public BrandLowestPriceResponse findLowestPricesByCategory() {
-        List<BrandView> allBrands = brandQueryPort.findAll();
-
-        return null;
-
+        // 각 브랜드의 총 가격을 계산하고 최저가격 브랜드를 찾음
+        return productsByBrand.entrySet().stream()
+                .map(entry -> BrandTotalPriceResponse.from(entry.getKey(), entry.getValue()))
+                .min((a, b) -> Long.compare(a.getTotalPrice(), b.getTotalPrice()))
+                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
     }
 } 
