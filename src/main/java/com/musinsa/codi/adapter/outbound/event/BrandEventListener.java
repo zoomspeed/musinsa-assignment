@@ -56,7 +56,9 @@ public class BrandEventListener {
                     .productId(productView.getProductId())
                     .brandId(productView.getBrandId())
                     .brandName(newBrandName)
-                    .category(productView.getCategory())
+                    .categoryId(productView.getCategoryId())
+                    .categoryCode(productView.getCategoryCode())
+                    .categoryName(productView.getCategoryName())
                     .price(productView.getPrice())
                     .build();
                     

@@ -38,7 +38,7 @@ public class ProductQueryController {
         CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
                 categoryCommandPort.findByCode(categoryCode)
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        return ResponseEntity.ok(productQueryPort.findByCategory(categoryResponse.toEntity()).stream()
+        return ResponseEntity.ok(productQueryPort.findByCategory(categoryResponse.toEntity().getId()).stream()
                 .map(ProductQueryResponse::from)
                 .collect(Collectors.toList()));
     }
@@ -51,7 +51,7 @@ public class ProductQueryController {
         CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
                 categoryCommandPort.findByCode(categoryCode)
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        return ResponseEntity.ok(productQueryPort.findByPriceRange(categoryResponse.toEntity(), minPrice, maxPrice).stream()
+        return ResponseEntity.ok(productQueryPort.findByPriceRange(categoryResponse.toEntity().getId(), minPrice, maxPrice).stream()
                 .map(ProductQueryResponse::from)
                 .collect(Collectors.toList()));
     }

@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductQueryRepository extends JpaRepository<ProductView, Long> {
-    List<ProductView> findByCategory(Category category);
+    List<ProductView> findByCategoryId(Long categoryId);
     
-    @Query("SELECT p FROM ProductView p WHERE p.category = :category AND p.price BETWEEN :minPrice AND :maxPrice")
-    List<ProductView> findByPriceRange(@Param("category") Category category, @Param("minPrice") int minPrice, @Param("maxPrice") int maxPrice);
+    @Query("SELECT p FROM ProductView p WHERE p.categoryId = :categoryId AND p.price BETWEEN :minPrice AND :maxPrice")
+    List<ProductView> findByPriceRange(@Param("categoryId") Long categoryId, @Param("minPrice") int minPrice, @Param("maxPrice") int maxPrice);
     
     List<ProductView> findByBrandId(Long brandId);
     
-    Optional<ProductView> findByIdAndCategory(Long id, Category category);
+    Optional<ProductView> findByIdAndCategoryId(Long id, Long categoryId);
 } 

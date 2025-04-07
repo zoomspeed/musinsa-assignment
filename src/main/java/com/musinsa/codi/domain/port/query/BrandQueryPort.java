@@ -9,7 +9,7 @@ public interface BrandQueryPort {
     List<BrandView> findAll();
     Optional<BrandView> findById(Long id);
     Optional<BrandView> findByName(String name);
-    List<BrandView> findByCategory(Category category);
+    List<BrandView> findByCategory(Long categoryId);
     List<BrandView> findByPriceRange(Category category, int minPrice, int maxPrice);
     BrandView save(BrandView brandView);
     void delete(Long id);

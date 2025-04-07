@@ -31,8 +31,8 @@ public class BrandQueryPersistenceAdapter implements BrandQueryPort {
     }
 
     @Override
-    public List<BrandView> findByCategory(Category category) {
-        return brandViewRepository.findByCategory(category);
+    public List<BrandView> findByCategory(Long categoryId) {
+        return brandViewRepository.findByCategory(categoryId);
     }
 
     @Override

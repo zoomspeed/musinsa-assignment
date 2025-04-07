@@ -26,13 +26,13 @@ public class ProductQueryPersistenceAdapter implements ProductQueryPort {
     }
 
     @Override
-    public List<ProductView> findByCategory(Category category) {
-        return productQueryRepository.findByCategory(category);
+    public List<ProductView> findByCategory(Long categoryId) {
+        return productQueryRepository.findByCategoryId(categoryId);
     }
 
     @Override
-    public List<ProductView> findByPriceRange(Category category, int minPrice, int maxPrice) {
-        return productQueryRepository.findByPriceRange(category, minPrice, maxPrice);
+    public List<ProductView> findByPriceRange(Long categoryId, int minPrice, int maxPrice) {
+        return productQueryRepository.findByPriceRange(categoryId, minPrice, maxPrice);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class ProductQueryPersistenceAdapter implements ProductQueryPort {
     }
     
     @Override
-    public Optional<ProductView> findByProductIdAndCategory(Long productId, Category category) {
-        return productQueryRepository.findByIdAndCategory(productId, category);
+    public Optional<ProductView> findByProductIdAndCategoryId(Long productId, Long categoryId) {
+        return productQueryRepository.findByIdAndCategoryId(productId, categoryId);
     }
 
     @Override

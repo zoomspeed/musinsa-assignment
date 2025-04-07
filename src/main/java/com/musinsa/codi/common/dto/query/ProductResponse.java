@@ -33,7 +33,10 @@ public class ProductResponse {
                 .productId(productView.getProductId())
                 .brandId(productView.getBrandId())
                 .brandName(productView.getBrandName())
-                .category(CategoryCommandResponse.from(productView.getCategory()))
+                .category(CategoryCommandResponse.builder()
+                        .categoryId(productView.getCategoryId())
+                        .name(productView.getCategoryName())
+                        .code(productView.getCategoryCode()).build())
                 .price(productView.getPrice())
                 .build();
     }

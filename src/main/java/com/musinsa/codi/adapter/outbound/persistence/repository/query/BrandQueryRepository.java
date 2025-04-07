@@ -14,9 +14,9 @@ import java.util.Optional;
 public interface BrandQueryRepository extends JpaRepository<BrandView, Long> {
     Optional<BrandView> findByName(String name);
     
-    @Query("SELECT DISTINCT b FROM BrandView b JOIN b.products p WHERE p.category = :category")
-    List<BrandView> findByCategory(@Param("category") Category category);
+    @Query("SELECT DISTINCT b FROM BrandView b JOIN b.products p WHERE p.categoryId = :categoryId")
+    List<BrandView> findByCategory(@Param("categoryId") Long categoryId);
     
-    @Query("SELECT DISTINCT b FROM BrandView b JOIN b.products p WHERE p.category = :category AND p.price BETWEEN :minPrice AND :maxPrice")
+    @Query("SELECT DISTINCT b FROM BrandView b JOIN b.products p WHERE p.categoryId = :category AND p.price BETWEEN :minPrice AND :maxPrice")
     List<BrandView> findByCategoryAndPriceBetween(@Param("category") Category category, @Param("minPrice") int minPrice, @Param("maxPrice") int maxPrice);
 } 

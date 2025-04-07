@@ -1,6 +1,7 @@
 package com.musinsa.codi.domain.service.query;
 
 import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
+import com.musinsa.codi.common.dto.query.BrandLowestPriceResponse;
 import com.musinsa.codi.common.exception.BusinessException;
 import com.musinsa.codi.common.exception.ErrorCode;
 import com.musinsa.codi.domain.model.query.BrandView;
@@ -27,10 +28,17 @@ public class BrandQueryService {
     }
 
     public List<BrandView> getBrandsByCategory(CategoryCommandResponse categoryResponse) {
-        return brandQueryPort.findByCategory(categoryResponse.toEntity());
+        return brandQueryPort.findByCategory(categoryResponse.toEntity().getId());
     }
 
     public List<BrandView> getBrandsByPriceRange(CategoryCommandResponse categoryResponse, int minPrice, int maxPrice) {
         return brandQueryPort.findByPriceRange(categoryResponse.toEntity(), minPrice, maxPrice);
+    }
+
+    public BrandLowestPriceResponse findLowestPricesByCategory() {
+        List<BrandView> allBrands = brandQueryPort.findAll();
+
+        return null;
+
     }
 } 

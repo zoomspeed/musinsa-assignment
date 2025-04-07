@@ -1,5 +1,6 @@
 package com.musinsa.codi.adapter.inbound.controller.query;
 
+import com.musinsa.codi.common.dto.query.BrandLowestPriceResponse;
 import com.musinsa.codi.common.dto.query.BrandQueryResponse;
 import com.musinsa.codi.domain.service.query.BrandQueryService;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,10 @@ public class BrandQueryController {
     public ResponseEntity<BrandQueryResponse> getBrandByName(@PathVariable String brandName) {
         BrandQueryResponse response = BrandQueryResponse.from(brandQueryService.getBrandByName(brandName));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/lowest-prices")
+    public ResponseEntity<BrandLowestPriceResponse> getLowestPricesByCategory() {
+        return ResponseEntity.ok(brandQueryService.findLowestPricesByCategory());
     }
 } 

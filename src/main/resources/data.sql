@@ -115,12 +115,15 @@ INSERT INTO products (name, price, category_id, brand_id) VALUES
 ('양말 I', 1700, (SELECT id FROM categories WHERE code = 'SOCKS'), (SELECT id FROM brands WHERE name = 'I')),
 ('액세서리 I', 2400, (SELECT id FROM categories WHERE code = 'ACCESSORY'), (SELECT id FROM brands WHERE name = 'I'));
 
-INSERT INTO product_view (product_id, brand_id, brand_name, category_id, price)
+INSERT INTO product_view (product_id, product_name, brand_id, brand_name, category_id, category_name, category_code, price)
 SELECT
     p.id AS product_id,
+    p.name AS product_name,
     b.id AS brand_id,
     b.name AS brand_name,
     c.id AS category_id,
+    c.name AS category_name,
+    c.code AS category_code,
     p.price
 FROM
     products p

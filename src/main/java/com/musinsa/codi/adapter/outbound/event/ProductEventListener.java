@@ -1,7 +1,7 @@
 package com.musinsa.codi.adapter.outbound.event;
 
 import com.musinsa.codi.domain.event.ProductEvent;
-import com.musinsa.codi.domain.event.ProductEventType;
+import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.command.Product;
 import com.musinsa.codi.domain.model.query.ProductView;
 import com.musinsa.codi.domain.port.query.ProductQueryPort;
@@ -82,11 +82,15 @@ public class ProductEventListener {
             // 기존 ProductView 확인
             List<ProductView> existingViews = productQueryPort.findByProductId(product.getId());
 
+            Category category = product.getCategory();
             ProductView productView = ProductView.builder()
                     .productId(product.getId())
+                    .productName(product.getName())
                     .brandId(product.getBrand().getId())
                     .brandName(brandName)
-                    .category(product.getCategory())
+                    .categoryId(category.getId())
+                    .categoryName(category.getName())
+                    .categoryCode(category.getCode())
                     .price(product.getPrice())
                     .build();
 
@@ -94,19 +98,22 @@ public class ProductEventListener {
                 ProductView existingView = existingViews.get(0);
                 productView = ProductView.builder()
                         .id(existingView.getId())
-                        .productId(product.getId())
+                        .productId(existingView.getProductId())
+                        .productName(existingView.getProductName())
                         .brandId(product.getBrand().getId())
                         .brandName(brandName)
-                        .category(product.getCategory())
+                        .categoryId(existingView.getCategoryId())
+                        .categoryName(existingView.getCategoryName())
+                        .categoryCode(existingView.getCategoryCode())
                         .price(product.getPrice())
                         .build();
                 log.info("ProductEventListener: 기존 상품 뷰 업데이트 - ID: {}, 카테고리: {}", 
-                        existingView.getId(), existingView.getCategory().getCode());
+                        existingView.getId(), existingView.getCategoryCode());
             }
             
             ProductView savedView = productQueryPort.save(productView);
             log.info("ProductEventListener: 상품 뷰 저장 성공 - ID: {}, ProductID: {}, 카테고리: {}, 이벤트 타입: {}",
-                    savedView.getId(), savedView.getProductId(), savedView.getCategory().getCode(), 
+                    savedView.getId(), savedView.getProductId(), savedView.getCategoryCode(),
                     isUpdate ? "UPDATE" : "CREATE");
             
         } catch (DataIntegrityViolationException e) {
