@@ -3,6 +3,7 @@ package com.musinsa.codi.domain.service.query;
 import com.musinsa.codi.application.usecase.query.CategoryQueryUseCase;
 import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
 import com.musinsa.codi.common.dto.query.CategoryLowestPriceResponse;
+import com.musinsa.codi.common.dto.query.CategoryPriceRangeResponse;
 import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.query.BrandView;
 import com.musinsa.codi.domain.model.query.ProductView;
@@ -89,5 +90,44 @@ public class CategoryQueryService implements CategoryQueryUseCase {
                 .categories(categories)
                 .totalPrice(totalPrice)
                 .build();
+    }
+    
+    public CategoryPriceRangeResponse getCategoryPriceRangeInfo(CategoryCommandResponse categoryResponse) {
+        Category category = categoryCommandPort.findByCode(categoryResponse.getCode())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryResponse.getCode()));
+        
+        // 해당 카테고리의 모든 상품 조회
+        List<ProductView> products = productQueryPort.findByCategory(category.getId());
+        
+        if (products.isEmpty()) {
+            throw new IllegalArgumentException("해당 카테고리에 상품이 없습니다: " + categoryResponse.getCode());
+        }
+        
+        // 최저가 상품 찾기
+        ProductView lowestPriceProduct = products.stream()
+                .min(Comparator.comparingInt(ProductView::getPrice))
+                .orElseThrow(() -> new IllegalArgumentException("최저가 상품을 찾을 수 없습니다."));
+        
+        // 최고가 상품 찾기
+        ProductView highestPriceProduct = products.stream()
+                .max(Comparator.comparingInt(ProductView::getPrice))
+                .orElseThrow(() -> new IllegalArgumentException("최고가 상품을 찾을 수 없습니다."));
+        
+        // 응답 DTO 구성
+        List<CategoryPriceRangeResponse.BrandPrice> lowestPrice = List.of(
+                CategoryPriceRangeResponse.BrandPrice.builder()
+                        .brandName(lowestPriceProduct.getBrandName())
+                        .price(lowestPriceProduct.getPrice())
+                        .build()
+        );
+        
+        List<CategoryPriceRangeResponse.BrandPrice> highestPrice = List.of(
+                CategoryPriceRangeResponse.BrandPrice.builder()
+                        .brandName(highestPriceProduct.getBrandName())
+                        .price(highestPriceProduct.getPrice())
+                        .build()
+        );
+        
+        return CategoryPriceRangeResponse.from(category, lowestPrice, highestPrice);
     }
 } 

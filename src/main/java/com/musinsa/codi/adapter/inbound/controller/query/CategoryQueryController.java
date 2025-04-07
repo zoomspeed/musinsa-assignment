@@ -6,6 +6,7 @@ import com.musinsa.codi.common.dto.query.BrandQueryResponse;
 import com.musinsa.codi.common.dto.query.CategoryResponse;
 import com.musinsa.codi.common.dto.query.ProductQueryResponse;
 import com.musinsa.codi.common.dto.query.CategoryLowestPriceResponse;
+import com.musinsa.codi.common.dto.query.CategoryPriceRangeResponse;
 import com.musinsa.codi.domain.port.command.CategoryCommandPort;
 import com.musinsa.codi.domain.service.query.CategoryQueryService;
 import lombok.RequiredArgsConstructor;
@@ -87,5 +88,14 @@ public class CategoryQueryController {
     @GetMapping("/lowest-prices")
     public ResponseEntity<CategoryLowestPriceResponse> getLowestPricesByCategory() {
         return ResponseEntity.ok(categoryQueryUseCase.findLowestPricesByCategory());
+    }
+    
+    @GetMapping("/price-range-info")
+    public ResponseEntity<CategoryPriceRangeResponse> getCategoryPriceRangeInfo(
+            @RequestParam String categoryCode) {
+        CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
+                categoryCommandPort.findByCode(categoryCode)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
+        return ResponseEntity.ok(categoryQueryService.getCategoryPriceRangeInfo(categoryResponse));
     }
 } 
