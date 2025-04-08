@@ -1,4 +1,3 @@
-SELECT * FROM brands;
 -- 카테고리 초기 데이터
 INSERT INTO categories (code, name, display_order, description) VALUES
 ('TOP', '상의', 1, '상의 카테고리입니다.'),

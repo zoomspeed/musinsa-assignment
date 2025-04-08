@@ -47,4 +47,25 @@ CREATE TABLE IF NOT EXISTS brand_view (
     name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-); 
+);
+
+-- 카테고리 테이블 인덱스
+CREATE INDEX IF NOT EXISTS idx_category_code ON categories(code);
+CREATE INDEX IF NOT EXISTS idx_display_order ON categories(display_order);
+
+-- 브랜드 테이블 인덱스
+CREATE INDEX IF NOT EXISTS idx_brand_name ON brands(name);
+
+-- 상품 테이블 인덱스
+CREATE INDEX IF NOT EXISTS idx_category_price ON products(category_id, price);
+CREATE INDEX IF NOT EXISTS idx_brand_price ON products(brand_id, price);
+CREATE INDEX IF NOT EXISTS idx_price ON products(price);
+
+-- 상품 뷰 테이블 인덱스
+CREATE INDEX IF NOT EXISTS idx_pv_category_price ON product_view(category_code, price);
+CREATE INDEX IF NOT EXISTS idx_pv_brand_price ON product_view(brand_name, price);
+CREATE INDEX IF NOT EXISTS idx_pv_product_id ON product_view(product_id);
+CREATE INDEX IF NOT EXISTS idx_pv_price ON product_view(price);
+
+-- 브랜드 뷰 테이블 인덱스
+CREATE INDEX IF NOT EXISTS idx_bv_name ON brand_view(name);
