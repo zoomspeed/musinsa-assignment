@@ -655,71 +655,85 @@ src/main/java/com/musinsa/codi
   }
   ```
 
-  - 상품 수정
-    - 엔드포인트: `PUT /api/v1/products/{productId}`
-    - 요청 예시:
-    ```json
-    {
-      "name": "프리미엄 티셔츠",
-      "brandName": "new-brand",
-      "categoryCode": "TOP",  
-      "price": 15000
-    }
-    ```
-    - 성공 응답 예시:
-    ```json
-    {
-      "success": true,
-      "message": "브랜드 new-brand의 상품 product-3가 성공적으로 업데이트되었습니다.",
-      "productId": 74,
-      "brandId": 10
-    }
-    ```
-    - 실패 응답 예시 1:
-    - 브랜드가 존재하지 않을 때
-    ```json
-    {
-      "status": 404,
-      "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
-    }
-    ```
-    - 실패 응답 예시 2:
-    - 상품번호가 존재하지 않을 때
-    ```json
-    {
-      "status": 404,
-      "message": "상품을 찾을 수 없습니다: {{productId}}"
-    }  
-    ```
+- 상품 수정
+  - 엔드포인트: `PUT /api/v1/products/{productId}`
+  - 요청 예시:
+  ```json
+  {
+    "name": "프리미엄 티셔츠",
+    "brandName": "new-brand",
+    "categoryCode": "TOP",  
+    "price": 15000
+  }
+  ```
+  - 성공 응답 예시:
+  ```json
+  {
+    "success": true,
+    "message": "브랜드 new-brand의 상품 product-3가 성공적으로 업데이트되었습니다.",
+    "productId": 74,
+    "brandId": 10
+  }
+  ```
+  - 실패 응답 예시 1:
+  - 브랜드가 존재하지 않을 때
+  ```json
+  {
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
+  }
+  ```
+  - 실패 응답 예시 2:
+  - 상품번호가 존재하지 않을 때
+  ```json
+  {
+    "status": 404,
+    "message": "상품을 찾을 수 없습니다: {{productId}}"
+  }  
+  ```
 
-    - 상품 삭제
-      - 엔드포인트: `DELETE /api/v1/products/{productId}`
-      - 요청 예시:
-      - 필수값: brandName (상품이 속한 브랜드 이름)
-      ```json
-      {
-        "brandName": "new-brand"  
-      }
-      ```
-      - 성공 응답: 200 OK
-      ```json
-      {
-        "success": true,
-        "message": "브랜드 new-brand의 상품(ID: {{productId}})이 성공적으로 삭제되었습니다. ",
-        "productId": 73,
-        "brandId": null
-      }
-      ```
-      - 실패 응답 예시:
-      ```json
-      {
-        "status": 404,
-        "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
-      }
-      ```
-      ```json
-      {
-        "status": 404,
-        "message": "상품을 찾을 수 없습니다"
-      }    
-      ```
+- 상품 삭제
+  - 엔드포인트: `DELETE /api/v1/products/{productId}`
+  - 요청 예시:
+  - 필수값: brandName (상품이 속한 브랜드 이름)
+  ```json
+  {
+    "brandName": "new-brand"  
+  }
+  ```
+  - 성공 응답: 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "브랜드 new-brand의 상품(ID: {{productId}})이 성공적으로 삭제되었습니다. ",
+    "productId": 73,
+    "brandId": null
+  }
+  ```
+  - 실패 응답 예시:
+  ```json
+  {
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
+  }
+  ```
+  ```json
+  {
+    "status": 404,
+    "message": "상품을 찾을 수 없습니다"
+  }    
+  ```
+
+## API 테스트
+
+### Postman 컬렉션
+API 테스트를 위한 Postman 컬렉션이 준비되어 있습니다. 아래 파일을 Postman으로 import하여 사용하실 수 있습니다:
+
+![img.png](docs/img.png)
+
+- [Musinsa API Collection](docs/musinsa.postman_collection.json)
+컬렉션에는 다음 API들이 포함되어 있습니다:
+- 상품 관리 API (생성/수정/삭제)
+- 카테고리별 최저가 조회 API
+- 단일 브랜드 최저가 조회 API
+- 카테고리별 가격 범위 조회 API
