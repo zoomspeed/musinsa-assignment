@@ -8,6 +8,7 @@ import com.musinsa.codi.domain.model.query.BrandView;
 import com.musinsa.codi.domain.model.query.ProductView;
 import com.musinsa.codi.domain.port.query.BrandQueryPort;
 import com.musinsa.codi.domain.port.query.ProductQueryPort;
+import com.musinsa.codi.domain.service.query.util.PriceCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,16 +37,37 @@ public class BrandQueryService implements BrandQueryUseCase {
 
     @Override
     public BrandLowestPriceResponse findLowestPricesByCategory() {
+        Map<String, List<ProductView>> productsByBrand = groupProductsByBrand();
+        return findBrandWithLowestTotalPrice(productsByBrand);
+    }
+
+    private Map<String, List<ProductView>> groupProductsByBrand() {
         List<ProductView> allProducts = productQueryPort.findAll();
-
-        // 브랜드별로 상품들을 그룹화
-        Map<String, List<ProductView>> productsByBrand = allProducts.stream()
+        return allProducts.stream()
                 .collect(Collectors.groupingBy(ProductView::getBrandName));
+    }
 
-        // 각 브랜드의 총 가격을 계산하고 최저가격 브랜드를 찾음
+    private BrandLowestPriceResponse findBrandWithLowestTotalPrice(Map<String, List<ProductView>> productsByBrand) {
         return productsByBrand.entrySet().stream()
-                .map(entry -> BrandLowestPriceResponse.from(entry.getKey(), entry.getValue()))
+                .map(entry -> createBrandLowestPriceResponse(entry.getKey(), entry.getValue()))
                 .min((a, b) -> Long.compare(a.getTotalPrice(), b.getTotalPrice()))
                 .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
+    }
+
+    private BrandLowestPriceResponse createBrandLowestPriceResponse(String brandName, List<ProductView> products) {
+        return BrandLowestPriceResponse.builder()
+                .brandName(brandName)
+                .categories(createCategoryPrices(products))
+                .totalPrice(PriceCalculator.calculateTotalPrice(products))
+                .build();
+    }
+
+    private List<BrandLowestPriceResponse.CategoryPrice> createCategoryPrices(List<ProductView> products) {
+        return products.stream()
+                .map(product -> BrandLowestPriceResponse.CategoryPrice.builder()
+                        .categoryName(product.getCategoryCode())
+                        .price(product.getPrice())
+                        .build())
+                .collect(Collectors.toList());
     }
 } 
