@@ -9,6 +9,7 @@ public enum ErrorCode {
     BRAND_NOT_FOUND(HttpStatus.NOT_FOUND, "브랜드를 찾을 수 없습니다: %s"),
     BRAND_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 브랜드입니다: %s"),
     BRAND_NO_PRODUCTS(HttpStatus.NOT_FOUND, "해당 브랜드에 상품이 없습니다: %s"),
+    BRAND_HAS_PRODUCTS(HttpStatus.CONFLICT, "해당 브랜드에 이미 상품이 존재하여 브랜드를 삭제할 수 없습니다. %s"),
     
     // Product related
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다: %s"),

@@ -7,7 +7,7 @@
 ### 1. 카테고리별 최저가 조회 API
 - 엔드포인트: `GET /api/v1/categories/lowest-price`
 - 각 카테고리별 최저가 브랜드와 가격, 총액을 조회
-- 응답 예시:
+- 성공 응답 예시:
 ```json
 {
   "categories": [
@@ -25,7 +25,7 @@
 ### 2. 단일 브랜드 최저가 조회 API
 - 엔드포인트: `GET /api/v1/brands/lowest-price`
 - 모든 카테고리 상품을 단일 브랜드에서 구매할 때 최저가 브랜드와 가격 정보 조회
-- 응답 예시:
+- 성공 응답 예시:
 ```json
 {
   "brandName": "D",
@@ -39,12 +39,19 @@
   "totalPrice": 36100
 }
 ```
+- 실패 응답 예시:
+```json
+{
+  "status": 404,
+  "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
+}
+```
 
 ### 3. 카테고리별 최저/최고가 조회 API
 - 엔드포인트: `GET /api/v1/categories/price-range-info`
 - 요청 파라미터: `categoryCode` (String)
 - 특정 카테고리의 최저가와 최고가 브랜드 및 가격 정보 조회
-- 응답 예시:
+- 성공 응답 예시:
 ```json
 {
   "category": "상의",
@@ -62,33 +69,68 @@
   ]
 }
 ```
+- 실패 응답 예시:
+```json
+{
+  "status": 404,
+  "message": "카테고리를 찾을 수 없습니다: {{categoryName}}"
+}
+```
 
 ### 4. 브랜드 및 상품 관리 API
 
 #### 브랜드 관리 API
 - 브랜드 목록 조회
   - 엔드포인트: `GET /api/v1/brands`
-  - 응답 예시:
+  - 성공 응답 예시:
   ```json
   [
     {
       "id": 1,
-      "name": "NEW_BRAND",
-      "description": "새로운 브랜드",
-      "createdAt": "2024-03-08T12:00:00"
+      "name": "A"
+    },
+    {
+      "id": 2,
+      "name": "B"
+    },
+    {
+      "id": 3,
+      "name": "C"
+    },
+    ...
+    {
+      "id": 9,
+      "name": "I"
     }
   ]
   ```
 
 - 브랜드 단일 조회
   - 엔드포인트: `GET /api/v1/brands/{brandName}`
-  - 응답 예시:
+  - 성공 응답 예시:
   ```json
   {
-    "id": 1,
-    "name": "NEW_BRAND",
-    "description": "새로운 브랜드",
-    "createdAt": "2024-03-08T12:00:00"
+    "id": 10,
+    "name": "new-brand",
+    "products": [
+      {
+        "id": 73,
+        "productId": 73,
+        "categoryCode": "ACCESSORY",
+        "categoryName": "액세서리",
+        "price": 10000,
+        "brandId": 10,
+        "brandName": "new-brand"
+      }
+      ...
+    ]
+  }
+  ```
+  - 실패 응답 예시:
+  ```json
+  {
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: new-brand-12345"
   }
   ```
 
@@ -97,17 +139,22 @@
   - 요청 예시:
   ```json
   {
-    "name": "NEW_BRAND",
-    "description": "새로운 브랜드"
+    "name": "new-brand"
   }
   ```
-  - 응답 예시:
+  - 성공 응답 예시:
   ```json
   {
-    "id": 1,
-    "name": "NEW_BRAND",
-    "description": "새로운 브랜드",
-    "createdAt": "2024-03-08T12:00:00"
+    "success": true,
+    "message": "브랜드 new-brand가 성공적으로 생성되었습니다.",
+    "brandId": 10
+  }
+  ```
+  - 실패 응답 예시:
+  ```json
+  {
+    "status": 409,
+    "message": "이미 존재하는 브랜드입니다: 이미 존재하는 브랜드 이름입니다: new-brand"
   }
   ```
 
@@ -116,22 +163,43 @@
   - 요청 예시:
   ```json
   {
-    "description": "수정된 브랜드 설명"
+    "name" : "new-brand-change"
   }
   ```
-  - 응답 예시:
+  - 성공 응답 예시:
   ```json
   {
-    "id": 1,
-    "name": "NEW_BRAND",
-    "description": "수정된 브랜드 설명",
-    "updatedAt": "2024-03-08T13:00:00"
+    "success": true,
+    "message": "브랜드명이 new-brand에서 new-brand-change로 성공적으로 변경되었습니다.",
+    "brandId": 10
+  }
+  ```
+  - 실패 응답 예시:
+  ```json
+  {
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: 존재하지 않는 브랜드입니다: new-brand"
   }
   ```
 
 - 브랜드 삭제
   - 엔드포인트: `DELETE /api/v1/brands/{brandName}`
-  - 응답: 204 No Content
+  - 성공 응답: 204 No Content
+  - 실패 응답 예시:
+  - 브랜드가 존재하지 않을경우 실패 응답
+  ```json
+  {
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: 존재하지 않는 브랜드입니다: brand-v1"
+  }
+  ```
+  - 브랜드 내부에 상품이 존재하면 삭제 실패처리
+  ```json
+  {
+    "status": 409,
+    "message": "해당 브랜드에 이미 상품이 존재하여 브랜드를 삭제할 수 없습니다. 이미 브랜드 내부에 상품이 존재하여 삭제할 수 없습니다: new-brand"
+  }
+  ```
 
 #### 상품 관리 API
 - 상품 목록 조회
@@ -139,23 +207,35 @@
   - 선택적 쿼리 파라미터:
     - `brandName`: 브랜드명으로 필터링
     - `categoryCode`: 카테고리로 필터링
-  - 응답 예시:
+  - 요청 예시:
   ```json
-  [
-    {
-      "id": 1,
-      "name": "기본 티셔츠",
-      "brandName": "NEW_BRAND",
-      "categoryCode": "TOP",
-      "price": 10000,
-      "createdAt": "2024-03-08T12:00:00"
-    }
-  ]
+  {
+    "name": "product-3",
+    "categoryCode": "ACCESSORY",
+    "price": 10000
+  }
+  ```
+  - 성공 응답 예시:
+  ```json
+  {
+    "success": true,
+    "message": "브랜드 new-brand에 상품 product-3가 성공적으로 추가되었습니다.",
+    "productId": 75,
+    "brandId": null
+  }
+  ```
+  - 실패 응답 예시:
+  - 브랜드가 존재하지 않을 때:
+  ```json
+  {
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: brand-v1"
+  }
   ```
 
 - 상품 단일 조회
   - 엔드포인트: `GET /api/v1/products/{productId}`
-  - 응답 예시:
+  - 성공 응답 예시:
   ```json
   {
     "id": 1,
@@ -164,6 +244,17 @@
     "categoryCode": "TOP",
     "price": 10000,
     "createdAt": "2024-03-08T12:00:00"
+  }
+  ```
+  - 실패 응답 예시:
+  ```json
+  {
+    "timestamp": "2024-03-08T12:00:00",
+    "status": 404,
+    "error": "Not Found",
+    "code": "PRODUCT_NOT_FOUND",
+    "message": "해당 상품(ID: 1)을 찾을 수 없습니다.",
+    "path": "/api/v1/products/1"
   }
   ```
 
@@ -178,7 +269,7 @@
     "price": 10000
   }
   ```
-  - 응답 예시:
+  - 성공 응답 예시:
   ```json
   {
     "id": 1,
@@ -187,6 +278,17 @@
     "categoryCode": "TOP",
     "price": 10000,
     "createdAt": "2024-03-08T12:00:00"
+  }
+  ```
+  - 실패 응답 예시:
+  ```json
+  {
+    "timestamp": "2024-03-08T12:00:00",
+    "status": 400,
+    "error": "Bad Request",
+    "code": "INVALID_PRODUCT_DATA",
+    "message": "상품 가격은 0보다 커야 합니다.",
+    "path": "/api/v1/products"
   }
   ```
 
@@ -199,7 +301,7 @@
     "price": 15000
   }
   ```
-  - 응답 예시:
+  - 성공 응답 예시:
   ```json
   {
     "id": 1,
@@ -210,10 +312,29 @@
     "updatedAt": "2024-03-08T13:00:00"
   }
   ```
+  - 실패 응답 예시 1:
+  - 브랜드가 존재하지 않을 때
+  ```json
+  {
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: brand-v1"
+  }
+  ```
 
 - 상품 삭제
   - 엔드포인트: `DELETE /api/v1/products/{productId}`
-  - 응답: 204 No Content
+  - 성공 응답: 204 No Content
+  - 실패 응답 예시:
+  ```json
+  {
+    "timestamp": "2024-03-08T12:00:00",
+    "status": 404,
+    "error": "Not Found",
+    "code": "PRODUCT_NOT_FOUND",
+    "message": "해당 상품(ID: 1)을 찾을 수 없습니다.",
+    "path": "/api/v1/products/1"
+  }
+  ```
 
 ## 프로젝트 구조
 

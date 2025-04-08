@@ -34,7 +34,9 @@ public class BrandCommandService implements BrandCommandUseCase {
     @PublishBrandEvent(eventType = BrandEventType.UPDATED)
     public Brand updateBrand(String brandName, BrandCommandRequest request) {
         Brand brand = findBrandByName(brandName);
-        validateBrandNameNotExists(request.getName());
+        if (!brandName.equals(request.getName())) {
+            validateBrandNameNotExists(request.getName());
+        }
         brand.updateName(request.getName());
         return brandCommandPort.save(brand);
     }
@@ -43,6 +45,10 @@ public class BrandCommandService implements BrandCommandUseCase {
     @PublishBrandEvent(eventType = BrandEventType.DELETED)
     public Brand deleteBrand(String brandName) {
         Brand brand = findBrandByName(brandName);
+        if (!brand.getProducts().isEmpty()) {
+            throw new BusinessException(ErrorCode.BRAND_HAS_PRODUCTS,
+                messageUtils.getMessage("error.brand.has.products", brandName));
+        }
         brandCommandPort.delete(brand.getId());
         return brand;
     }
@@ -54,7 +60,7 @@ public class BrandCommandService implements BrandCommandUseCase {
     }
 
     private void validateBrandNameNotExists(String name) {
-        if (brandCommandPort.findByName(name).isPresent()) {
+        if (brandCommandPort.existsByName(name)) {
             throw new BusinessException(ErrorCode.BRAND_ALREADY_EXISTS, 
                 messageUtils.getMessage("error.brand.name.already.exists", name));
         }
