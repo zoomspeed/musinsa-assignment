@@ -5,6 +5,7 @@ import com.musinsa.codi.common.annotation.PublishBrandEvent;
 import com.musinsa.codi.common.dto.command.BrandCommandRequest;
 import com.musinsa.codi.common.exception.BusinessException;
 import com.musinsa.codi.common.exception.ErrorCode;
+import com.musinsa.codi.common.util.MessageUtils;
 import com.musinsa.codi.domain.event.BrandEventType;
 import com.musinsa.codi.domain.model.command.Brand;
 import com.musinsa.codi.domain.port.command.BrandCommandPort;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BrandCommandService implements BrandCommandUseCase {
     private final BrandCommandPort brandCommandPort;
+    private final MessageUtils messageUtils;
 
     @Override
     @PublishBrandEvent(eventType = BrandEventType.CREATED)
@@ -47,12 +49,14 @@ public class BrandCommandService implements BrandCommandUseCase {
 
     private Brand findBrandByName(String name) {
         return brandCommandPort.findByName(name)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND, 
+                    messageUtils.getMessage("error.brand.not.found", name)));
     }
 
     private void validateBrandNameNotExists(String name) {
         if (brandCommandPort.findByName(name).isPresent()) {
-            throw new BusinessException(ErrorCode.BRAND_ALREADY_EXISTS);
+            throw new BusinessException(ErrorCode.BRAND_ALREADY_EXISTS, 
+                messageUtils.getMessage("error.brand.name.already.exists", name));
         }
     }
 } 

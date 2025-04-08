@@ -3,6 +3,7 @@ package com.musinsa.codi.adapter.inbound.controller.command;
 import com.musinsa.codi.application.usecase.command.ProductCommandUseCase;
 import com.musinsa.codi.common.dto.command.ProductCommandRequest;
 import com.musinsa.codi.common.dto.command.ProductCommandResponse;
+import com.musinsa.codi.common.util.MessageUtils;
 import com.musinsa.codi.domain.model.command.Product;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ProductCommandController {
     private final ProductCommandUseCase productCommandUseCase;
+    private final MessageUtils messageUtils;
 
     @PostMapping
     public ResponseEntity<ProductCommandResponse> addProduct(
@@ -22,7 +24,7 @@ public class ProductCommandController {
         Product product = productCommandUseCase.addProduct(brandName, request);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
-                .message("상품이 성공적으로 추가되었습니다.")
+                .message(messageUtils.getMessage("success.product.created", brandName, product.getName()))
                 .productId(product.getId())
                 .build());
     }
@@ -35,7 +37,7 @@ public class ProductCommandController {
         Product product = productCommandUseCase.updateProduct(brandName, productId, request);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
-                .message("상품이 성공적으로 업데이트되었습니다.")
+                .message(messageUtils.getMessage("success.product.updated", brandName, product.getName()))
                 .productId(product.getId())
                 .build());
     }
@@ -47,7 +49,7 @@ public class ProductCommandController {
         productCommandUseCase.deleteProduct(brandName, productId);
         return ResponseEntity.ok(ProductCommandResponse.builder()
                 .success(true)
-                .message("상품이 성공적으로 삭제되었습니다.")
+                .message(messageUtils.getMessage("success.product.deleted", brandName, productId))
                 .productId(productId)
                 .build());
     }
