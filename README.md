@@ -130,7 +130,7 @@
   ```json
   {
     "status": 404,
-    "message": "브랜드를 찾을 수 없습니다: new-brand-12345"
+    "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
   }
   ```
 
@@ -154,7 +154,7 @@
   ```json
   {
     "status": 409,
-    "message": "이미 존재하는 브랜드입니다: 이미 존재하는 브랜드 이름입니다: new-brand"
+    "message": "이미 존재하는 브랜드입니다: 이미 존재하는 브랜드 이름입니다: {{brandName}}"
   }
   ```
 
@@ -170,7 +170,7 @@
   ```json
   {
     "success": true,
-    "message": "브랜드명이 new-brand에서 new-brand-change로 성공적으로 변경되었습니다.",
+    "message": "브랜드명이 {{이전 브랜드명}}에서 {{변경된 브랜드명}}로 성공적으로 변경되었습니다.",
     "brandId": 10
   }
   ```
@@ -178,7 +178,7 @@
   ```json
   {
     "status": 404,
-    "message": "브랜드를 찾을 수 없습니다: 존재하지 않는 브랜드입니다: new-brand"
+    "message": "브랜드를 찾을 수 없습니다: 존재하지 않는 브랜드입니다: {{brandName}}"
   }
   ```
 
@@ -190,14 +190,14 @@
   ```json
   {
     "status": 404,
-    "message": "브랜드를 찾을 수 없습니다: 존재하지 않는 브랜드입니다: brand-v1"
+    "message": "브랜드를 찾을 수 없습니다: 존재하지 않는 브랜드입니다: {{brandName}}"
   }
   ```
   - 브랜드 내부에 상품이 존재하면 삭제 실패처리
   ```json
   {
     "status": 409,
-    "message": "해당 브랜드에 이미 상품이 존재하여 브랜드를 삭제할 수 없습니다. 이미 브랜드 내부에 상품이 존재하여 삭제할 수 없습니다: new-brand"
+    "message": "해당 브랜드에 이미 상품이 존재하여 브랜드를 삭제할 수 없습니다. 이미 브랜드 내부에 상품이 존재하여 삭제할 수 없습니다: {{brandName}}"
   }
   ```
 
@@ -219,7 +219,7 @@
   ```json
   {
     "success": true,
-    "message": "브랜드 new-brand에 상품 product-3가 성공적으로 추가되었습니다.",
+    "message": "브랜드 {{brandName}}에 상품 {{productName}}가 성공적으로 추가되었습니다.",
     "productId": 75,
     "brandId": null
   }
@@ -229,7 +229,7 @@
   ```json
   {
     "status": 404,
-    "message": "브랜드를 찾을 수 없습니다: brand-v1"
+    "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
   }
   ```
 
@@ -237,34 +237,30 @@
   - 엔드포인트: `GET /api/v1/products/{productId}`
   - 성공 응답 예시:
   ```json
-  {
-    "id": 1,
-    "name": "기본 티셔츠",
-    "brandName": "NEW_BRAND",
-    "categoryCode": "TOP",
-    "price": 10000,
-    "createdAt": "2024-03-08T12:00:00"
-  }
-  ```
-  - 실패 응답 예시:
-  ```json
-  {
-    "timestamp": "2024-03-08T12:00:00",
-    "status": 404,
-    "error": "Not Found",
-    "code": "PRODUCT_NOT_FOUND",
-    "message": "해당 상품(ID: 1)을 찾을 수 없습니다.",
-    "path": "/api/v1/products/1"
-  }
-  ```
+    {
+      "id": 1,
+      "productId": 1,
+      "categoryCode": "TOP",
+      "categoryName": "상의",
+      "price": 11200,
+      "brandId": 1,
+      "brandName": "A"
+    }
+    ```
+    - 실패 응답 예시:
+    ```json
+    {
+      "status": 404,
+      "message": "상품을 찾을 수 없습니다: {{productName}}"
+    }
+    ```
 
 - 상품 생성
-  - 엔드포인트: `POST /api/v1/products`
+  - 엔드포인트: `POST /v1/brands/{brandName}/products`
   - 요청 예시:
   ```json
   {
     "name": "기본 티셔츠",
-    "brandName": "NEW_BRAND",
     "categoryCode": "TOP",
     "price": 10000
   }
@@ -272,28 +268,22 @@
   - 성공 응답 예시:
   ```json
   {
-    "id": 1,
-    "name": "기본 티셔츠",
-    "brandName": "NEW_BRAND",
-    "categoryCode": "TOP",
-    "price": 10000,
-    "createdAt": "2024-03-08T12:00:00"
+    "success": true,
+    "message": "브랜드 new-brand에 상품 product-3가 성공적으로 추가되었습니다.",
+    "productId": 73,
+    "brandId": null
   }
   ```
   - 실패 응답 예시:
   ```json
   {
-    "timestamp": "2024-03-08T12:00:00",
-    "status": 400,
-    "error": "Bad Request",
-    "code": "INVALID_PRODUCT_DATA",
-    "message": "상품 가격은 0보다 커야 합니다.",
-    "path": "/api/v1/products"
+    "status": 404,
+    "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
   }
   ```
 
 - 상품 수정
-  - 엔드포인트: `PUT /api/v1/products/{productId}`
+  - 엔드포인트: `PUT /api/v1/brands/{brandName}/products/{productId}`
   - 요청 예시:
   ```json
   {
@@ -304,12 +294,10 @@
   - 성공 응답 예시:
   ```json
   {
-    "id": 1,
-    "name": "프리미엄 티셔츠",
-    "brandName": "NEW_BRAND",
-    "categoryCode": "TOP",
-    "price": 15000,
-    "updatedAt": "2024-03-08T13:00:00"
+    "success": true,
+    "message": "브랜드 new-brand의 상품 product-3가 성공적으로 업데이트되었습니다.",
+    "productId": 74,
+    "brandId": null
   }
   ```
   - 실패 응답 예시 1:
@@ -317,22 +305,34 @@
   ```json
   {
     "status": 404,
-    "message": "브랜드를 찾을 수 없습니다: brand-v1"
+    "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
   }
+  ```
+  - 실패 응답 예시 2:
+  - 상품번호가 존재하지 않을 때
+  ```json
+  {
+    "status": 404,
+    "message": "상품을 찾을 수 없습니다: {{productId}}"
+  }  
   ```
 
 - 상품 삭제
-  - 엔드포인트: `DELETE /api/v1/products/{productId}`
-  - 성공 응답: 204 No Content
+  - 엔드포인트: `DELETE /api/v1/brands/{brandName}/products/{productId}`
+  - 성공 응답: 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "브랜드 new-brand의 상품(ID: {{productId}})이 성공적으로 삭제되었습니다. ",
+    "productId": 73,
+    "brandId": null
+  }
+  ```
   - 실패 응답 예시:
   ```json
   {
-    "timestamp": "2024-03-08T12:00:00",
     "status": 404,
-    "error": "Not Found",
-    "code": "PRODUCT_NOT_FOUND",
-    "message": "해당 상품(ID: 1)을 찾을 수 없습니다.",
-    "path": "/api/v1/products/1"
+    "message": "브랜드를 찾을 수 없습니다: {{brandName}}"
   }
   ```
 
