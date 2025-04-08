@@ -1,5 +1,5 @@
 package com.musinsa.codi.domain.event;
 
-public enum ProductEventType {
+public enum ProductEventType implements EventType {
     CREATED, UPDATED, DELETED
 } 
