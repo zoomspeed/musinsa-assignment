@@ -275,7 +275,6 @@ public void onBrandEvent(BrandEvent event) {
 [Query 모델 (가격 조회, 카테고리별 조회 등)]
 - 조회에 최적화된 별도의 뷰 테이블 구성
 - 복잡한 조인이나 서브쿼리 없이 조회 가능
-- Redis 캐시를 통한 응답 속도 개선
 ```
 
 특히 카테고리별 최저가 조회의 경우:
