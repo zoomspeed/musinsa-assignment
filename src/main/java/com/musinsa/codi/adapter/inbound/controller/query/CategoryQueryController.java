@@ -2,9 +2,7 @@ package com.musinsa.codi.adapter.inbound.controller.query;
 
 import com.musinsa.codi.application.usecase.query.CategoryQueryUseCase;
 import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
-import com.musinsa.codi.common.dto.query.BrandQueryResponse;
 import com.musinsa.codi.common.dto.query.CategoryResponse;
-import com.musinsa.codi.common.dto.query.ProductQueryResponse;
 import com.musinsa.codi.common.dto.query.CategoryLowestPriceResponse;
 import com.musinsa.codi.common.dto.query.CategoryPriceRangeResponse;
 import com.musinsa.codi.domain.port.command.CategoryCommandPort;

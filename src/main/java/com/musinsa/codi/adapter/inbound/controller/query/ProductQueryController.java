@@ -1,6 +1,5 @@
 package com.musinsa.codi.adapter.inbound.controller.query;
 
-import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
 import com.musinsa.codi.common.dto.query.ProductQueryResponse;
 import com.musinsa.codi.domain.port.command.CategoryCommandPort;
 import com.musinsa.codi.domain.port.query.ProductQueryPort;
@@ -33,25 +32,25 @@ public class ProductQueryController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/category/{categoryCode}")
-    public ResponseEntity<List<ProductQueryResponse>> getProductsByCategory(@PathVariable String categoryCode) {
-        CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
-                categoryCommandPort.findByCode(categoryCode)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        return ResponseEntity.ok(productQueryPort.findByCategory(categoryResponse.toEntity().getId()).stream()
+    @GetMapping("/category")
+    public ResponseEntity<List<ProductQueryResponse>> getProductsByCategory(@RequestParam String categoryCode) {
+        Long categoryId = categoryCommandPort.findByCode(categoryCode)
+                .map(category -> category.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode));
+        return ResponseEntity.ok(productQueryPort.findByCategory(categoryId).stream()
                 .map(ProductQueryResponse::from)
                 .collect(Collectors.toList()));
     }
 
-    @GetMapping("/category/{categoryCode}/price-range")
+    @GetMapping("/category/price-range")
     public ResponseEntity<List<ProductQueryResponse>> getProductsByPriceRange(
-            @PathVariable String categoryCode,
+            @RequestParam String categoryCode,
             @RequestParam int minPrice,
             @RequestParam int maxPrice) {
-        CategoryCommandResponse categoryResponse = CategoryCommandResponse.from(
-                categoryCommandPort.findByCode(categoryCode)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
-        return ResponseEntity.ok(productQueryPort.findByPriceRange(categoryResponse.toEntity().getId(), minPrice, maxPrice).stream()
+        Long categoryId = categoryCommandPort.findByCode(categoryCode)
+                .map(category -> category.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode));
+        return ResponseEntity.ok(productQueryPort.findByPriceRange(categoryId, minPrice, maxPrice).stream()
                 .map(ProductQueryResponse::from)
                 .collect(Collectors.toList()));
     }
