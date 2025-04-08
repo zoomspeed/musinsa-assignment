@@ -22,7 +22,7 @@ public class CategoryQueryController {
         return ResponseEntity.ok(categoryQueryUseCase.getAllCategories());
     }
 
-    @GetMapping("/lowest-prices")
+    @GetMapping("/lowest-price")
     public ResponseEntity<CategoryLowestPriceResponse> getLowestPricesByCategory() {
         return ResponseEntity.ok(categoryQueryUseCase.findLowestPricesByCategory());
     }
