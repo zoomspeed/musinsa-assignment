@@ -3540,27 +3540,47 @@ src/main/java/com/musinsa/codi
 #### 상품 관리 API
 - 상품 목록 조회
   - 엔드포인트: `GET /api/v1/products`
-  - 선택적 쿼리 파라미터:
-    - `brandName`: 브랜드명으로 필터링
-    - `categoryCode`: 카테고리로 필터링
-  - 요청 예시:
-  ```json
-  {
-    "name": "product-3",
-    "categoryCode": "ACCESSORY",
-    "price": 10000
-  }
-  ```
   - 성공 응답 예시:
   ```json
-  {
-    "success": true,
-    "message": "브랜드 {{brandName}}에 상품 {{productName}}가 성공적으로 추가되었습니다.",
-    "productId": 75,
-    "brandId": null
-  }
+    [
+      {
+        "id": 1,
+        "productId": 1,
+        "categoryCode": "TOP",
+        "categoryName": "상의",
+        "price": 11200,
+        "brandId": 1,
+        "brandName": "A"
+      },
+      {
+        "id": 2,
+        "productId": 2,
+        "categoryCode": "OUTER",
+        "categoryName": "아우터",
+        "price": 5500,
+        "brandId": 1,
+        "brandName": "A"
+      },
+    ...
+      {
+        "id": 73,
+        "productId": 73,
+        "categoryCode": "ACCESSORY",
+        "categoryName": "액세서리",
+        "price": 10000,
+        "brandId": 10,
+        "brandName": "new-brand"
+      }
+    ]
   ```
   - 실패 응답 예시:
+  - 생성 요청에서 브랜드명 기입 안했을 때:
+  ```json 
+    {
+      "status": 400,
+      "message": "브랜드명은 필수 입력 항목입니다."
+    }  
+  ```
   - 브랜드가 존재하지 않을 때:
   ```json
   {
@@ -3584,19 +3604,21 @@ src/main/java/com/musinsa/codi
     }
     ```
   - 실패 응답 예시:
-    ```json
+  
+  ```json
     {
       "status": 404,
       "message": "상품을 찾을 수 없습니다: {{productName}}"
     }
-    ```
+  ```
 
 - 상품 생성
-  - 엔드포인트: `POST /v1/brands/{brandName}/products`
+  - 엔드포인트: `POST /api/v1/products`
   - 요청 예시:
   ```json
   {
     "name": "기본 티셔츠",
+    "brandName": "new-brand",  
     "categoryCode": "TOP",
     "price": 10000
   }
@@ -3619,11 +3641,13 @@ src/main/java/com/musinsa/codi
   ```
 
 - 상품 수정
-  - 엔드포인트: `PUT /api/v1/brands/{brandName}/products/{productId}`
+  - 엔드포인트: `PUT /api/v1/products/{productId}`
   - 요청 예시:
   ```json
   {
     "name": "프리미엄 티셔츠",
+    "brandName": "new-brand",
+    "categoryCode": "TOP",  
     "price": 15000
   }
   ```
@@ -3654,7 +3678,13 @@ src/main/java/com/musinsa/codi
   ```
 
 - 상품 삭제
-  - 엔드포인트: `DELETE /api/v1/brands/{brandName}/products/{productId}`
+  - 엔드포인트: `DELETE /api/v1/products/{productId}`
+  - 요청 예시:
+  ```json
+  {
+    "brandName": "new-brand"  
+  }
+  ```
   - 성공 응답: 200 OK
   ```json
   {
