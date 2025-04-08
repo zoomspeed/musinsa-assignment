@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Builder
-public class BrandTotalPriceResponse {
+public class BrandLowestPriceResponse {
     private String brandName;
     private List<CategoryPrice> categories;
     private long totalPrice;
@@ -20,7 +20,7 @@ public class BrandTotalPriceResponse {
         private long price;
     }
 
-    public static BrandTotalPriceResponse from(String brandName, List<ProductView> products) {
+    public static BrandLowestPriceResponse from(String brandName, List<ProductView> products) {
         List<CategoryPrice> categoryPrices = products.stream()
                 .map(product -> CategoryPrice.builder()
                         .categoryName(product.getCategoryName())
@@ -32,7 +32,7 @@ public class BrandTotalPriceResponse {
                 .mapToLong(CategoryPrice::getPrice)
                 .sum();
 
-        return BrandTotalPriceResponse.builder()
+        return BrandLowestPriceResponse.builder()
                 .brandName(brandName)
                 .categories(categoryPrices)
                 .totalPrice(totalPrice)
