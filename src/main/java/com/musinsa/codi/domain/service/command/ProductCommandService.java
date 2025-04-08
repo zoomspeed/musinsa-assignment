@@ -6,6 +6,7 @@ import com.musinsa.codi.common.annotation.PublishProductEvent;
 import com.musinsa.codi.common.dto.command.ProductCommandRequest;
 import com.musinsa.codi.common.exception.BusinessException;
 import com.musinsa.codi.common.exception.ErrorCode;
+import com.musinsa.codi.common.util.MessageUtils;
 import com.musinsa.codi.domain.event.BrandEventType;
 import com.musinsa.codi.domain.event.ProductEventPublisher;
 import com.musinsa.codi.domain.event.ProductEvent;
@@ -28,6 +29,7 @@ public class ProductCommandService implements ProductCommandUseCase {
     private final BrandCommandPort brandCommandPort;
     private final CategoryCommandPort categoryCommandPort;
     private final ProductEventPublisher productEventPublisher;
+    private final MessageUtils messageUtils;
 
     @Override
     @PublishBrandEvent(eventType = BrandEventType.UPDATED)
@@ -38,16 +40,17 @@ public class ProductCommandService implements ProductCommandUseCase {
                 .name(request.getName())
                 .price(request.getPrice())
                 .category(categoryCommandPort.findByCode(request.getCategoryCode())
-                        .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND)))
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND,
+                            messageUtils.getMessage("error.category.not.found", request.getCategoryCode()))))
                 .build();
         
         brand.addProduct(product);
         Brand savedBrand = brandCommandPort.save(brand);
         
-        // 저장된 브랜드의 상품 목록에서 마지막 상품을 반환
         List<Product> savedProducts = savedBrand.getProducts();
         if (savedProducts.isEmpty()) {
-            throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
+            throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND,
+                messageUtils.getMessage("error.product.not.found", "Failed to save product"));
         }
         return savedProducts.get(savedProducts.size() - 1);
     }
@@ -59,12 +62,12 @@ public class ProductCommandService implements ProductCommandUseCase {
         Brand brand = findBrandByName(brandName);
         Product existingProduct = brand.findProductById(productId);
         
-        // 기존 상품의 정보를 업데이트
         existingProduct.update(
             request.getName(), 
             request.getPrice(), 
             categoryCommandPort.findByCode(request.getCategoryCode())
-                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND))
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND,
+                    messageUtils.getMessage("error.category.not.found", request.getCategoryCode())))
         );
         brandCommandPort.save(brand);
         
@@ -76,20 +79,17 @@ public class ProductCommandService implements ProductCommandUseCase {
     public void deleteProduct(String brandName, Long productId) {
         Brand brand = findBrandByName(brandName);
         Product productToDelete = brand.findProductById(productId);
-        
-        // AOP에서 void 메서드의 Product 인자를 감지하지 못할 수 있으므로
-        // 여기서는 직접 이벤트를 발행합니다
-        log.debug("ProductCommandService: 상품 삭제 이벤트 직접 발행 - ID: {}, 이름: {}", 
+
+        log.info("ProductCommandService: 상품 삭제 이벤트 직접 발행 - ID: {}, 이름: {}",
                 productToDelete.getId(), productToDelete.getName());
         productEventPublisher.publish(new ProductEvent(productToDelete, ProductEventType.DELETED));
-        
-        // 상품 삭제 처리
+
         brand.removeProduct(productId);
         brandCommandPort.save(brand);
     }
 
     private Brand findBrandByName(String name) {
         return brandCommandPort.findByName(name)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND, name));
     }
 } 
