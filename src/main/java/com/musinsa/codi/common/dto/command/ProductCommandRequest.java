@@ -15,11 +15,15 @@ public class ProductCommandRequest {
     @NotBlank(message = "상품명은 필수 입력 항목입니다.")
     private String name;
     
+    @NotBlank(message = "브랜드명은 필수 입력 항목입니다.")
+    private String brandName;
+    
     @NotBlank(message = "카테고리 코드는 필수 입력 항목입니다.")
     private String categoryCode;
     
+    @NotNull(message = "가격은 필수 입력 항목입니다.")
     @Min(value = 0, message = "가격은 0 이상이어야 합니다.")
-    private int price;
+    private Integer price;
 
     public Product toProduct(CategoryCommandPort categoryCommandPort) {
         Category category = categoryCommandPort.findByCode(categoryCode)

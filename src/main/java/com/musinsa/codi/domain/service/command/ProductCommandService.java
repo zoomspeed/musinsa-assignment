@@ -79,11 +79,11 @@ public class ProductCommandService implements ProductCommandUseCase {
     public void deleteProduct(String brandName, Long productId) {
         Brand brand = findBrandByName(brandName);
         Product productToDelete = brand.findProductById(productId);
-        
+
         log.info("ProductCommandService: 상품 삭제 이벤트 직접 발행 - ID: {}, 이름: {}",
                 productToDelete.getId(), productToDelete.getName());
         productEventPublisher.publish(new ProductEvent(productToDelete, ProductEventType.DELETED));
-        
+
         brand.removeProduct(productId);
         brandCommandPort.save(brand);
     }
