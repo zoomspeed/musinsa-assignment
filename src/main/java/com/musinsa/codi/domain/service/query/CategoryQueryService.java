@@ -5,6 +5,8 @@ import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
 import com.musinsa.codi.common.dto.query.CategoryLowestPriceResponse;
 import com.musinsa.codi.common.dto.query.CategoryPriceRangeResponse;
 import com.musinsa.codi.common.dto.query.CategoryResponse;
+import com.musinsa.codi.common.exception.BusinessException;
+import com.musinsa.codi.common.exception.ErrorCode;
 import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.query.BrandView;
 import com.musinsa.codi.domain.model.query.ProductView;
@@ -41,41 +43,79 @@ public class CategoryQueryService implements CategoryQueryUseCase {
     public CategoryCommandResponse getCategoryByCode(String categoryCode) {
         return CategoryCommandResponse.from(
                 categoryCommandPort.findByCode(categoryCode)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, categoryCode)));
     }
 
     public List<BrandView> getBrandsByCategory(CategoryCommandResponse categoryResponse) {
         Category category = categoryCommandPort.findByCode(categoryResponse.getCode())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryResponse.getCode()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, categoryResponse.getCode()));
         return brandQueryPort.findByCategory(category.getId());
     }
 
     public List<ProductView> getProductsByCategory(CategoryCommandResponse categoryResponse) {
         Category category = categoryCommandPort.findByCode(categoryResponse.getCode())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryResponse.getCode()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, categoryResponse.getCode()));
         return productQueryPort.findByCategory(category.getId());
     }
 
     public List<BrandView> getBrandsByPriceRange(CategoryCommandResponse categoryResponse, int minPrice, int maxPrice) {
-        return brandQueryPort.findByPriceRange(categoryResponse.toEntity(), minPrice, maxPrice);
+        Category category = categoryCommandPort.findByCode(categoryResponse.getCode())
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, categoryResponse.getCode()));
+        return brandQueryPort.findByPriceRange(category, minPrice, maxPrice);
     }
 
     public List<ProductView> getProductsByPriceRange(CategoryCommandResponse categoryResponse, int minPrice, int maxPrice) {
-        return productQueryPort.findByPriceRange(categoryResponse.toEntity().getId(), minPrice, maxPrice);
+        Category category = categoryCommandPort.findByCode(categoryResponse.getCode())
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, categoryResponse.getCode()));
+        return productQueryPort.findByPriceRange(category.getId(), minPrice, maxPrice);
+    }
+
+    @Override
+    public CategoryPriceRangeResponse getCategoryPriceRangeInfo(String categoryCode) {
+        Category category = categoryCommandPort.findByCode(categoryCode)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, categoryCode));
+        
+        List<ProductView> products = productQueryPort.findByCategory(category.getId());
+        
+        if (products.isEmpty()) {
+            throw new BusinessException(ErrorCode.CATEGORY_NO_PRODUCTS, categoryCode);
+        }
+        
+        ProductView lowestPriceProduct = products.stream()
+                .min(Comparator.comparingInt(ProductView::getPrice))
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_LOWEST_PRICE_NOT_FOUND));
+        
+        ProductView highestPriceProduct = products.stream()
+                .max(Comparator.comparingInt(ProductView::getPrice))
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_HIGHEST_PRICE_NOT_FOUND));
+        
+        List<CategoryPriceRangeResponse.BrandPrice> lowestPrice = List.of(
+                CategoryPriceRangeResponse.BrandPrice.builder()
+                        .brandName(lowestPriceProduct.getBrandName())
+                        .price(lowestPriceProduct.getPrice())
+                        .build()
+        );
+        
+        List<CategoryPriceRangeResponse.BrandPrice> highestPrice = List.of(
+                CategoryPriceRangeResponse.BrandPrice.builder()
+                        .brandName(highestPriceProduct.getBrandName())
+                        .price(highestPriceProduct.getPrice())
+                        .build()
+        );
+
+        return CategoryPriceRangeResponse.from(category, lowestPrice, highestPrice);
     }
 
     @Override
     public CategoryLowestPriceResponse findLowestPricesByCategory() {
-        // 모든 상품 뷰 조회
         List<ProductView> allProducts = productQueryPort.findAll();
         
-        // 카테고리별로 그룹화하고 최저가 상품 찾기
         Map<Long, Category> categoryMap = categoryCommandPort.findAll().stream()
                 .collect(Collectors.toMap(Category::getId, category -> category));
 
         Map<Category, ProductView> lowestPriceProducts = allProducts.stream()
                 .collect(Collectors.groupingBy(
-                        pv -> categoryMap.get(pv.getCategoryId()),  // Long -> Category로 변환
+                        pv -> categoryMap.get(pv.getCategoryId()),
                         Collectors.minBy(Comparator.comparingInt(ProductView::getPrice))
                 ))
                 .entrySet().stream()
@@ -84,11 +124,10 @@ public class CategoryQueryService implements CategoryQueryUseCase {
                         entry -> entry.getKey(),
                         entry -> entry.getValue().get()
                 ));
-        // 응답 DTO 구성
+
         List<CategoryLowestPriceResponse.CategoryPrice> categories = new ArrayList<>();
         int totalPrice = 0;
 
-        // 모든 카테고리를 조회하여 순회
         List<Category> allCategories = categoryCommandPort.findAll();
         for (Category category : allCategories) {
             ProductView product = lowestPriceProducts.get(category);
@@ -106,45 +145,5 @@ public class CategoryQueryService implements CategoryQueryUseCase {
                 .categories(categories)
                 .totalPrice(totalPrice)
                 .build();
-    }
-    
-    @Override
-    public CategoryPriceRangeResponse getCategoryPriceRangeInfo(String categoryCode) {
-        Category category = categoryCommandPort.findByCode(categoryCode)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode));
-        
-        // 해당 카테고리의 모든 상품 조회
-        List<ProductView> products = productQueryPort.findByCategory(category.getId());
-        
-        if (products.isEmpty()) {
-            throw new IllegalArgumentException("해당 카테고리에 상품이 없습니다: " + categoryCode);
-        }
-        
-        // 최저가 상품 찾기
-        ProductView lowestPriceProduct = products.stream()
-                .min(Comparator.comparingInt(ProductView::getPrice))
-                .orElseThrow(() -> new IllegalArgumentException("최저가 상품을 찾을 수 없습니다."));
-        
-        // 최고가 상품 찾기
-        ProductView highestPriceProduct = products.stream()
-                .max(Comparator.comparingInt(ProductView::getPrice))
-                .orElseThrow(() -> new IllegalArgumentException("최고가 상품을 찾을 수 없습니다."));
-        
-        // 응답 DTO 구성
-        List<CategoryPriceRangeResponse.BrandPrice> lowestPrice = List.of(
-                CategoryPriceRangeResponse.BrandPrice.builder()
-                        .brandName(lowestPriceProduct.getBrandName())
-                        .price(lowestPriceProduct.getPrice())
-                        .build()
-        );
-        
-        List<CategoryPriceRangeResponse.BrandPrice> highestPrice = List.of(
-                CategoryPriceRangeResponse.BrandPrice.builder()
-                        .brandName(highestPriceProduct.getBrandName())
-                        .price(highestPriceProduct.getPrice())
-                        .build()
-        );
-
-        return CategoryPriceRangeResponse.from(category, lowestPrice, highestPrice);
     }
 } 
