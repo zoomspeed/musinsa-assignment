@@ -31,7 +31,7 @@ public class BrandQueryService implements BrandQueryUseCase {
     @Override
     public BrandView getBrandByName(String brandName) {
         return brandQueryPort.findByName(brandName)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND, brandName));
     }
 
     @Override
