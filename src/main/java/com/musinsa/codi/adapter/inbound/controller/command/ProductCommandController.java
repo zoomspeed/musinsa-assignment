@@ -26,6 +26,7 @@ public class ProductCommandController {
                 .success(true)
                 .message(messageUtils.getMessage("success.product.created", brandName, product.getName()))
                 .productId(product.getId())
+                .brandId(product.getBrand().getId())
                 .build());
     }
 
@@ -39,6 +40,7 @@ public class ProductCommandController {
                 .success(true)
                 .message(messageUtils.getMessage("success.product.updated", brandName, product.getName()))
                 .productId(product.getId())
+                .brandId(product.getBrand().getId())
                 .build());
     }
 
@@ -51,6 +53,7 @@ public class ProductCommandController {
                 .success(true)
                 .message(messageUtils.getMessage("success.product.deleted", brandName, productId))
                 .productId(productId)
+                .brandId(null)
                 .build());
     }
 } 
