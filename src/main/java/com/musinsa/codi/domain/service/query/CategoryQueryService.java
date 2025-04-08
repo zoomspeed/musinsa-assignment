@@ -4,6 +4,7 @@ import com.musinsa.codi.application.usecase.query.CategoryQueryUseCase;
 import com.musinsa.codi.common.dto.command.CategoryCommandResponse;
 import com.musinsa.codi.common.dto.query.CategoryLowestPriceResponse;
 import com.musinsa.codi.common.dto.query.CategoryPriceRangeResponse;
+import com.musinsa.codi.common.dto.query.CategoryResponse;
 import com.musinsa.codi.domain.model.command.Category;
 import com.musinsa.codi.domain.model.query.BrandView;
 import com.musinsa.codi.domain.model.query.ProductView;
@@ -27,6 +28,21 @@ public class CategoryQueryService implements CategoryQueryUseCase {
     private final BrandQueryPort brandQueryPort;
     private final ProductQueryPort productQueryPort;
     private final CategoryCommandPort categoryCommandPort;
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+        return categoryCommandPort.findAll().stream()
+                .map(CategoryCommandResponse::from)
+                .map(dto -> new CategoryResponse(dto.getCode(), dto.getName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CategoryCommandResponse getCategoryByCode(String categoryCode) {
+        return CategoryCommandResponse.from(
+                categoryCommandPort.findByCode(categoryCode)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode)));
+    }
 
     public List<BrandView> getBrandsByCategory(CategoryCommandResponse categoryResponse) {
         Category category = categoryCommandPort.findByCode(categoryResponse.getCode())
@@ -92,15 +108,16 @@ public class CategoryQueryService implements CategoryQueryUseCase {
                 .build();
     }
     
-    public CategoryPriceRangeResponse getCategoryPriceRangeInfo(CategoryCommandResponse categoryResponse) {
-        Category category = categoryCommandPort.findByCode(categoryResponse.getCode())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryResponse.getCode()));
+    @Override
+    public CategoryPriceRangeResponse getCategoryPriceRangeInfo(String categoryCode) {
+        Category category = categoryCommandPort.findByCode(categoryCode)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다: " + categoryCode));
         
         // 해당 카테고리의 모든 상품 조회
         List<ProductView> products = productQueryPort.findByCategory(category.getId());
         
         if (products.isEmpty()) {
-            throw new IllegalArgumentException("해당 카테고리에 상품이 없습니다: " + categoryResponse.getCode());
+            throw new IllegalArgumentException("해당 카테고리에 상품이 없습니다: " + categoryCode);
         }
         
         // 최저가 상품 찾기
@@ -127,7 +144,7 @@ public class CategoryQueryService implements CategoryQueryUseCase {
                         .price(highestPriceProduct.getPrice())
                         .build()
         );
-        
+
         return CategoryPriceRangeResponse.from(category, lowestPrice, highestPrice);
     }
 } 
