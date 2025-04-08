@@ -360,6 +360,22 @@ src/main/java/com/musinsa/codi
 
 ## API 문서
 
+### 카테고리 코드 정보
+상품 생성/수정 시 사용되는 카테고리 코드는 다음과 같습니다:
+
+| 카테고리 코드 | 카테고리명 | 설명 |
+|------------|-----------|------|
+| TOP        | 상의      | 상의 카테고리입니다. |
+| OUTER      | 아우터     | 아우터 카테고리입니다. |
+| BOTTOM     | 바지      | 하의 카테고리입니다. |
+| SHOES      | 스니커즈   | 신발 카테고리입니다. |
+| BAG        | 가방      | 가방 카테고리입니다. |
+| HAT        | 모자      | 모자 카테고리입니다. |
+| SOCKS      | 양말      | 양말 카테고리입니다. |
+| ACCESSORY  | 액세서리   | 액세서리 카테고리입니다. |
+
+> **중요**: 상품 생성/수정 시 반드시 위 카테고리 코드를 정확히 입력해야 합니다.
+
 구현된 API들을 자세히 설명드리겠습니다.
 
 ### 1. 카테고리별 최저가 조회 API
@@ -401,6 +417,8 @@ src/main/java/com/musinsa/codi
 ### 3. 카테고리별 최저/최고가 조회 API
 - 엔드포인트: `GET /api/v1/categories/price-range-info`
 - 요청 파라미터: `categoryCode` (String)
+  - 예시: `/api/v1/categories/price-range-info?categoryCode=TOP`
+  - 사용 가능한 카테고리 코드: TOP, OUTER, BOTTOM, SHOES, BAG, HAT, SOCKS, ACCESSORY
 - 특정 카테고리의 최저가와 최고가 브랜드 및 가격 정보 조회
 - 성공 응답 예시:
 ```json
@@ -634,10 +652,11 @@ src/main/java/com/musinsa/codi
   {
     "name": "기본 티셔츠",
     "brandName": "new-brand",  
-    "categoryCode": "TOP",
+    "categoryCode": "TOP",     // 반드시 정의된 카테고리 코드 중 하나를 사용
     "price": 10000
   }
   ```
+  > **참고**: categoryCode는 위에 정의된 카테고리 코드 표를 참고하여 입력해 주세요.
   - 성공 응답 예시:
   ```json
   {
