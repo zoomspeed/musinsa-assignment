@@ -1,4 +1,4 @@
-# 무신사 백엔드 과제
+# [MUSINSA] Java(Kotlin) Backend Engineer - 과제
 
 ## 프로젝트 소개
 
